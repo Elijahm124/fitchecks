@@ -7,18 +7,11 @@
     <ul>
     {% for fit in fits %}
         <li>
+            <a href="{% url 'fits:fit' closet.owner closet.style fit.id %}">
             <img
                 src="{{ fit.image.url }}" alt="img"
             >
-            <p>
-                {{ fit.description }}
-            </p>
-            <p>
-                {{ fit.tags }}
-            </p>
-            <p>
-                {{ fit.date_added|date:'M d, Y' }}
-            </p>
+                </a>
         </li>
     {% empty %}
         <li>There are no fits for {{ closet.owner }}'s closet {{ closet }} yet</li>

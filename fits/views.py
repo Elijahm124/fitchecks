@@ -14,3 +14,13 @@ def closet(request, style, owner):
         'fits': fits
     }
     return render(request, 'fits/closet.html', context)
+
+
+def fit(request, style, owner, fit_id):
+    closet = Closet.objects.get(style=style, owner__username=owner)
+    fit = closet.fit_set.get(closet__fit__id=fit_id)
+    context = {
+        'closet': closet,
+        'fit': fit
+    }
+    return render(request, 'fits/fit.html', context)

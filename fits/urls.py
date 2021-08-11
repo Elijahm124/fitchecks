@@ -5,4 +5,5 @@ app_name = 'fits'
 urlpatterns = [
     path('', views.index, name='index'),
     path('<owner>/closets/<style>', views.closet, name='closet'),
+    path('<owner>/closets/<style>/<fit_id>', views.fit, name='fit'),
 ]
