@@ -1,0 +1,18 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+    <a href="{% url 'fits:closet' closet.owner closet.style %}">
+        {{ closet.style }}<br>
+    </a>
+    <img
+                src="{{ fit.image.url }}" alt="img"
+            >
+            <p>
+                {{ fit.description }}
+            </p>
+            <p>
+                {{ fit.tags }}
+            </p>
+            <p>
+                {{ fit.date_added|date:'M d, Y' }}
+            </p>
+{% endblock content %}
