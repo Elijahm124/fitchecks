@@ -1,0 +1,15 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+    <p>{{ closet.owner }}'s Closets</p><br>
+    <ul>
+    {% for closet in closets %}
+        <li>
+            <a href="{% url 'fits:single_closet' closet.owner closet.style %}">
+                {{ closet.style }}
+                </a>
+        </li>
+    {% empty %}
+        <li>There are no fits for {{ closet.owner }}'s closet {{ closet }} yet</li>
+    {% endfor %}
+    </ul>
+{% endblock content %}

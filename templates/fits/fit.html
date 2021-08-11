@@ -1,6 +1,6 @@
 {% extends 'fits/base.html' %}
 {% block content %}
-    <a href="{% url 'fits:closet' closet.owner closet.style %}">
+    <a href="{% url 'fits:single_closet' closet.owner closet.style %}">
         {{ closet.style }}<br>
     </a>
     <img
