@@ -3,5 +3,24 @@
         FitChecks
     </a>
 </p>
+<p>
+{% if user.is_authenticated %}
+    Hello, {{ user.username }}.
+    <a href="{% url 'users:logout' %}">
+        Log Out
+    </a>
+    <a
+        href="{% url 'fits:closets' user %}">
+        Your Closet
+    </a>
+{% else %}
+    <a href="{% url 'users:register' %}">
+        Register
+    </a> -
+    <a href="{% url 'users:login' %}">
+        Log In
+    </a>
+{% endif %}
+</p>
 
 {% block content %}{% endblock content %}
