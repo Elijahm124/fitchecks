@@ -13,6 +13,12 @@
         href="{% url 'fits:closets' user %}">
         Your Closet
     </a>
+    <a href="{% url 'fits:new_closet' user %}">
+        New Closet
+    </a>
+    <a href="{% url 'fits:new_fit' user %}">
+        New Fit
+    </a>
 {% else %}
     <a href="{% url 'users:register' %}">
         Register

@@ -7,7 +7,7 @@
     <ul>
     {% for fit in fits %}
         <li>
-            <a href="{% url 'fits:fit' closet.owner closet.style fit.id %}">
+            <a href="{% url 'fits:fit' closet.owner fit.id %}">
             <img
                 src="{{ fit.image.url }}" alt="img"
             >

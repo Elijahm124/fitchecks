@@ -1,8 +1,5 @@
 {% extends 'fits/base.html' %}
 {% block content %}
-    <a href="{% url 'fits:single_closet' closet.owner closet.style %}">
-        {{ closet.style }}<br>
-    </a>
     <img
                 src="{{ fit.image.url }}" alt="img"
             >
@@ -14,5 +11,8 @@
             </p>
             <p>
                 {{ fit.date_added|date:'M d, Y' }}
+            </p>
+            <p>
+                {{ fit.id }}
             </p>
 {% endblock content %}

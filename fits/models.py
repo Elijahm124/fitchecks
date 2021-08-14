@@ -22,7 +22,8 @@ class Fit(models.Model):
     image = models.ImageField(upload_to='images/')
     tags = models.CharField(max_length=100, blank=True)
     closet = models.ForeignKey(Closet, on_delete=models.PROTECT)
-    id = models.CharField(max_length=32, primary_key=True, default=uuid.uuid4().hex[:8], editable=False)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.CharField(max_length=32, primary_key=True, default=uuid.uuid4().hex[:8], editable=False, unique=True)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
