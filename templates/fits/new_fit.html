@@ -1,0 +1,11 @@
+{% extends 'fits/base.html' %}
+
+{% block content %}
+    <p>New Fit: </p>
+
+    <form action="{% url 'fits:new_fit' owner %}" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Add Fit</button>
+    </form>
+{% endblock content %}
