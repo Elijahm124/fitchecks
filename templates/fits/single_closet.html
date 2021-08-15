@@ -2,12 +2,23 @@
 {% block content %}
 
     <p>{{ closet }}</p>
+{% if closet.style != 'main_closet' %}
+    <button type="button">
+    <a href="{% url 'fits:delete_closet' closet.owner closet.style %}">Delete Closet</a>
+    </button>
+    <button type="button">
+    <a href="{% url 'fits:remove_fits' closet.owner closet.style %}">Remove Fits</a>
+    </button>
+    <button type="button">
+    <a href="{% url 'fits:add_fits' closet.owner closet.style %}">Add Fits</a>
+    </button>
+{% endif %}
 
     <p>Fits:</p>
     <ul>
     {% for fit in fits %}
         <li>
-            <a href="{% url 'fits:fit' closet.owner fit.id %}">
+            <a href="{% url 'fits:fit' closet.owner fit.shown_id %}">
             <img
                 src="{{ fit.image.url }}" alt="img"
             >

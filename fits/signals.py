@@ -8,4 +8,3 @@ from .models import Closet
 def create_profile(sender, instance, created, **kwargs):
     if created:
         Closet.objects.create(owner=instance)
-

@@ -1,0 +1,9 @@
+<div class='col-sm-6 col-sm-offset-3'>
+        <p>Are you sure you want to delete this Outift</p>
+        <p>{{ fit.description }}</p>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Delete" />
+            <input type="button" value="Cancel" onclick="window.location='{% url 'fits:fit' fit.owner fit.shown_id %}'"/>
+        </form>
+</div>

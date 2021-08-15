@@ -1,0 +1,27 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+
+    <p>{{ closet }}</p>
+
+    <p>Fits:</p>
+    <ul>
+    {% for fit in fits %}
+        <li>
+            <a href="{% url 'fits:fit' closet.owner fit.shown_id %}">
+            <img
+                src="{{ fit.image.url }}" alt="img"
+            >
+                </a>
+            {% if closet.style != 'main_closet' %}
+                <form action="" method="get">
+                <button class = "btn btn-default" name="DeleteButton" value="{{ fit.id }}">Delete</button>
+                </form>
+            {% endif %}
+
+        </li>
+    {% empty %}
+        <li>There are no fits for {{ closet.owner }}'s closet {{ closet }}</li>
+    {% endfor %}
+    </ul>
+
+{% endblock content %}

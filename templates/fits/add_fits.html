@@ -1,0 +1,28 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+    <p> Adding to
+    <a href="{% url 'fits:single_closet' curr_closet.owner curr_closet.style %}">
+        {{ curr_closet.style }}
+    </a></p>
+
+    <p>Fits:</p>
+    <ul>
+    {% for fit in fits %}
+        <li>
+            <a href="{% url 'fits:fit' main_closet.owner fit.shown_id %}">
+            <img
+                src="{{ fit.image.url }}" alt="img"
+            >
+                </a>
+            {% if curr_closet.style != 'main_closet' %}
+                <form action="" method="get">
+                <button class = "btn btn-default" name="AddButton" value="{{ fit.id }}">Add</button>
+                </form>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>There are no fits to add to {{ curr_closet.style }}</li>
+    {% endfor %}
+    </ul>
+
+{% endblock content %}

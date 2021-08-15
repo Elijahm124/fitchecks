@@ -13,6 +13,12 @@
                 {{ fit.date_added|date:'M d, Y' }}
             </p>
             <p>
-                {{ fit.id }}
+                {{ fit.shown_id }}
             </p>
+            <button type="button">
+            <a href="{% url 'fits:delete_fit' fit.owner fit.shown_id %}">Delete</a>
+            </button>
+            <button type="button">
+            <a href="{% url 'fits:edit_fit' fit.owner fit.shown_id %}">Edit</a>
+            </button>
 {% endblock content %}

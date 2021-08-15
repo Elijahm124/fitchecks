@@ -1,0 +1,14 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+    <!-- change fit to something better as link, maybe add a title to fit
+    or shorten the caption-->
+    <p><a href="{% url 'fits:fit' fit.owner fit.shown_id %}">{{ fit }}...</a> </p>
+
+    <p>Edit Fit</p>
+    <form action="{% url 'fits:edit_fit' fit.owner fit.shown_id %}" method='post'> {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Save changes</button>
+     </form>
+
+
+{% endblock content %}

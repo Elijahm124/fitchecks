@@ -2,9 +2,9 @@ from django import forms
 from .models import Fit, Closet
 
 
-class NewClosetForm(forms.ModelForm):
+class ClosetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(NewClosetForm, self).__init__(*args, **kwargs)
+        super(ClosetForm, self).__init__(*args, **kwargs)
         self.fields['style'].initial = ''
 
     class Meta:
@@ -12,14 +12,20 @@ class NewClosetForm(forms.ModelForm):
         fields = ['style']
 
     def clean(self):
-        cleaned_data = super(NewClosetForm, self).clean()
+        cleaned_data = super(ClosetForm, self).clean()
         sty = self.cleaned_data.get('style')
         if sty in ['main_closet', 'new_closet']:
             raise forms.ValidationError(f'Cannot name closet {sty}')
         return cleaned_data
 
 
-class NewFitForm(forms.ModelForm):
+class FitForm(forms.ModelForm):
     class Meta:
         model = Fit
         fields = ['description', 'image', 'tags', 'closet']
+
+    closet = forms.ModelMultipleChoiceField(
+        queryset=Closet.objects.exclude(style__exact='main_closet'),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )

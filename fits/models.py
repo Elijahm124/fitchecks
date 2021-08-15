@@ -21,9 +21,9 @@ class Fit(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='images/')
     tags = models.CharField(max_length=100, blank=True)
-    closet = models.ForeignKey(Closet, on_delete=models.PROTECT)
+    closet = models.ManyToManyField(Closet)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    id = models.CharField(max_length=32, primary_key=True, default=uuid.uuid4().hex[:8], editable=False, unique=True)
+    shown_id = models.CharField(max_length=32, primary_key=False, default=lambda: uuid.uuid4().hex[:8], editable=False)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

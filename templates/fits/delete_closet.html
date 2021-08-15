@@ -1,0 +1,8 @@
+<div class='col-sm-6 col-sm-offset-3'>
+        <p>Are you sure you want to delete {{ closet.style }}</p>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Delete" />
+            <input type="button" value="Cancel" onclick="window.location='{% url 'fits:single_closet' closet.owner closet.style %}'"/>
+        </form>
+</div>
