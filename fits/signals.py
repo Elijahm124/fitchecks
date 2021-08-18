@@ -7,4 +7,4 @@ from .models import Closet
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
-        Closet.objects.create(owner=instance)
+        Closet.objects.create(owner=instance, private=False)

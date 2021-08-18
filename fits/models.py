@@ -8,6 +8,7 @@ class Closet(models.Model):
     style = models.CharField(max_length=50, default="main_closet")
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
+    private = models.BooleanField(default=False)
 
     def __str__(self):
         if " " in self.style:
@@ -23,7 +24,8 @@ class Fit(models.Model):
     tags = models.CharField(max_length=100, blank=True)
     closet = models.ManyToManyField(Closet)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    shown_id = models.CharField(max_length=32, primary_key=False, default=lambda: uuid.uuid4().hex[:8], editable=False)
+    shown_id = models.CharField(max_length=32, primary_key=False, default=uuid.uuid4().hex[:8], editable=False)
+    private = models.BooleanField(default=False)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
