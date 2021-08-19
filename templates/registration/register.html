@@ -5,7 +5,8 @@
     <form method="post"
           action="{% url 'users:register' %}">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ uform.as_p }}
+        {{ pform.as_p }}
 
         <button name="submit">Register</button>
         <input type="hidden" name="next"

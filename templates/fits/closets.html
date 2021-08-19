@@ -1,6 +1,20 @@
 {% extends 'fits/base.html' %}
 {% block content %}
-    <p>{{ owner }}'s Closets</p><br>
+    <p>{{ owner.username }}'s Closets</p><br>
+    {% if not same %}
+        <!--console.log("not same")-->
+        {% if is_following %}
+                <form action="" method="post">
+                {% csrf_token %}
+                <button class = "btn btn-default" name="FunButton" >Unfollow</button>
+                </form>
+        {% elif not is_following %}
+                <form action="" method="post">
+                {% csrf_token %}
+                <button class = "btn btn-default" name="FunButton" >Follow</button>
+                </form>
+        {% endif %}
+    {% endif %}
     <ul>
     {% for closet in closets %}
         <li>
