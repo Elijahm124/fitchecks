@@ -2,9 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import ProfileForm
 from django.contrib.auth.forms import UserCreationForm
+from django.http import Http404
 
 
 def register(request):
+    if request.user.is_authenticated:
+        raise Http404
+
     if request.method != 'POST':
         # blank registration form
         uform = UserCreationForm()

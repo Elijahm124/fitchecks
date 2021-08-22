@@ -18,23 +18,6 @@ class Profile(models.Model):
         else:
             return "media/images/default.png"
 
-    """def save(self, *args, **kwargs):
-        # Did we have to resize the image?
-        # We pop it to remove from kwargs when we pass these along
-        image_resized = kwargs.pop('image_resized', False)
-
-        if self.profile_pic and image_resized:
-            basewidth = 100
-            filename = self.profile_pic.path
-            image = Image.open(filename)
-            img = image.resize((basewidth, basewidth), Image.ANTIALIAS)
-            self.profile_pic = img
-        # Save the updated photo, but inform when we do that we
-        # have resized so we don't try and do it again.
-            self.save(image_resized=True)
-
-        super(Profile, self).save(*args, **kwargs)"""
-
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, *args, **kwargs):
         # saving image first
