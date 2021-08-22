@@ -21,6 +21,13 @@
                 <button class = "btn btn-default" name="FunButton" >Follow</button>
                 </form>
         {% endif %}
+    {% else %}
+        <button type="button">
+        <a href="{% url 'users:edit_profile' owner %}">Edit Profile</a>
+        </button>
+        <button type="button">
+        <a href="{% url 'users:delete_profile' owner %}">Delete Profile</a>
+        </button>
     {% endif %}
     <ul>
     {% for closet in closets %}
