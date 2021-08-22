@@ -1,0 +1,12 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+    <p><a href="{% url 'fits:single_closet' closet.owner closet.style %}">{{ closet }}</a> </p>
+
+    <p>Edit Closet</p>
+    <form action="{% url 'fits:edit_closet' closet.owner closet.style %}" method='post'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Save changes</button>
+     </form>
+
+{% endblock content %}

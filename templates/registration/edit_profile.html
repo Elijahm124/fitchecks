@@ -1,0 +1,14 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+    <!-- change fit to something better as link, maybe add a title to fit
+    or shorten the caption-->
+    <p><a href="{% url 'fits:closets' profile.user  %}">{{ profile.user }}...</a> </p>
+
+    <p>Edit Closet</p>
+    <form action="{% url 'users:edit_profile' profile.user%}" method='post'> {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Save changes</button>
+     </form>
+
+
+{% endblock content %}

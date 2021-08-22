@@ -1,0 +1,12 @@
+
+{% block content %}
+    <a href="{% url 'fits:all' %}">
+        All Posts
+    </a>
+    {% if user.is_authenticated %}
+        <a href="{% url 'fits:index' %}">
+        Your Feed
+    </a>
+    {% endif %}
+
+{% endblock content %}

@@ -7,6 +7,7 @@
 <p>FitChecks is your own virtual closet, where you can store
 specific outfits, and see other people's outfits and use it as inspiration</p>
     <p>Fits:</p>
+    {% if fits %}
     <ul>
     {% for fit in fits %}
         <li>
@@ -20,4 +21,5 @@ specific outfits, and see other people's outfits and use it as inspiration</p>
         <li>There are no fits yet</li>
     {% endfor %}
     </ul>
+    {% endif %}
 {% endblock content%}

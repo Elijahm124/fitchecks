@@ -9,11 +9,25 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request, 'fits/index.html')
+    if not request.user.is_authenticated:
+        return redirect("fits:all")
+    followed_people = request.user.profile.following.all()
+    fits = Fit.objects.filter(owner__profile__in=followed_people, private=False)
+    context = {'fits': fits}
+    return render(request, 'fits/index.html', context)
+
+
+def all(request):
+    fits = Fit.objects.filter(private=False)
+    context = {'fits': fits}
+    return render(request, 'fits/all.html', context)
 
 
 def closets(request, owner):
-    closets = Closet.objects.filter(owner__username=owner).order_by('-date_added')
+    if owner == str(request.user):
+        closets = Closet.objects.filter(owner__username=owner).order_by('-date_added')
+    else:
+        closets = Closet.objects.filter(owner__username=owner, private=False).order_by('-date_added')
     context = {}
     same = True
     if owner != str(request.user) and request.user.is_authenticated:
@@ -50,10 +64,14 @@ def closets(request, owner):
 def closet(request, style, owner):
     closet = Closet.objects.get(style=style, owner__username=owner)
     same = True
-    if owner != str(request.user):
+    if owner == str(request.user):
+        fits = closet.fit_set.order_by('-date_added')
+    else:
+        if closet.private:
+            raise Http404
         same = False
+        fits = closet.fit_set.filter(private=False).order_by('-date_added')
     owner = get_object_or_404(User, username=owner)
-    fits = closet.fit_set.order_by('-date_added')
     context = {
         'closet': closet,
         'fits': fits,
@@ -67,6 +85,8 @@ def fit(request, owner, shown_id):
     fit = Fit.objects.get(shown_id=shown_id, owner__username=owner)
     same = True
     if owner != str(request.user):
+        if fit.private:
+            raise Http404
         same = False
     owner = get_object_or_404(User, username=owner)
     context = {
@@ -149,10 +169,31 @@ def edit_fit(request, shown_id, owner):
     else:
         form = FitForm(request.POST, request.FILES, instance=fit)
         if form.is_valid():
-            form.save()
+            edited_fit = form.save(commit=False)
+            main_closet = Closet.objects.get(style__exact="main_closet", owner__username=owner)
+            main_closet.save()
+            edited_fit.closet.add(main_closet)
+            edited_fit.save()
+
             return redirect('fits:closets', owner=fit.owner)
     context = {'fit': fit, 'form': form}
     return render(request, 'fits/edit_fit.html', context)
+
+
+@login_required
+def edit_closet(request, owner, style):
+    if owner != str(request.user):
+        raise Http404
+    closet = get_object_or_404(Closet, ~Q(style='main_closet'), style=style, owner__username=owner)
+    if request.method != 'POST':
+        form = ClosetForm(instance=closet)
+    else:
+        form = ClosetForm(request.POST, """request.FILES""", instance=closet)
+        if form.is_valid():
+            form.save()
+            return redirect('fits:single_closet', style=closet.style, owner=closet.owner)
+    context = {'closet': closet, 'form': form}
+    return render(request, 'fits/edit_closet.html', context)
 
 
 @login_required
@@ -202,5 +243,3 @@ def add_fits(request, owner, style):
         'fits': fits
     }
     return render(request, 'fits/add_fits.html', context)
-
-

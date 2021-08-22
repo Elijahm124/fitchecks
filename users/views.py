@@ -10,7 +10,7 @@ def register(request):
         uform = UserCreationForm()
         pform = ProfileForm()
     else:
-        pform = ProfileForm(data=request.POST)
+        pform = ProfileForm(request.POST, request.FILES)
         uform = UserCreationForm(data=request.POST)
 
         if uform.is_valid() and pform.is_valid():

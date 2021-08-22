@@ -9,7 +9,7 @@ class ClosetForm(forms.ModelForm):
 
     class Meta:
         model = Closet
-        fields = ['style']
+        fields = ['style', 'private']
 
     def clean(self):
         cleaned_data = super(ClosetForm, self).clean()
@@ -22,7 +22,7 @@ class ClosetForm(forms.ModelForm):
 class FitForm(forms.ModelForm):
     class Meta:
         model = Fit
-        fields = ['description', 'image', 'tags', 'closet']
+        fields = ['description', 'image', 'tags', 'closet', 'private']
 
     closet = forms.ModelMultipleChoiceField(
         queryset=Closet.objects.exclude(style__exact='main_closet'),
