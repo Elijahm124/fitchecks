@@ -1,11 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Closet, Fit
+from django.shortcuts import render, redirect, get_object_or_404, reverse
+from .models import Closet, Fit, Top
 from users.models import Profile
-from .forms import ClosetForm, FitForm
+from .forms import ClosetForm, FitForm, TopForm
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+import json
 
 
 def index(request):
@@ -120,20 +121,45 @@ def new_closet(request, owner):
 @login_required
 def new_fit(request, owner):
     """Create new Outfit"""
+    request.session['top_count'] = 0
+
     if owner != str(request.user):
         raise Http404
 
+    context = {'owner': owner, }
     if request.method != 'POST':
         form = FitForm()
-    else:
+        form1 = TopForm()
+        context.update({"form": form,
+                        "form1": form1})
+
+    if request.method == "POST" and "new_top" in request.POST:
+
+        form1 = TopForm(request.POST, initial=request.session.get('form_data'))
+        if form1.is_valid() and request.is_ajax():
+            print("top_added")
+            request.session['top_count'] += 1
+            request.session[f'form_data_{request.session["top_count"]}'] = form1.cleaned_data
+            form1 = TopForm()
+
+    if request.method == "POST" and "add_fit" in request.POST:
+
         form = FitForm(request.POST, request.FILES)
+
+        m = Top.objects.create(**request.session['form_data'])
+        print(m)
 
         if form.is_valid():
             new_fit = form.save(commit=False)
             main_closet = Closet.objects.get(style__exact="main_closet", owner__username=owner)
             main_closet.save()
+
             new_fit.owner = request.user
+
             new_fit.save()
+            if request.session['top_count'] > 0:
+                for i in range(1, request.session['top_count']+1):
+                    new_fit.top_set.add(Top.objects.create(**request.session[f'form_data_{i}']))
             products = request.POST.getlist('closet')
             for product in products:
                 if Closet.objects.all().exists():
@@ -142,8 +168,6 @@ def new_fit(request, owner):
             new_fit.closet.add(main_closet)
             return redirect('fits:closets', owner=new_fit.owner)
 
-    context = {'form': form,
-               'owner': owner}
     return render(request, 'fits/new_fit.html', context)
 
 

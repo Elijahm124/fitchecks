@@ -29,8 +29,9 @@ class Fit(models.Model):
     private = models.BooleanField(default=False)
 
     def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        super().save()  # saving image first
+             update_fields=None, *args, **kwargs):
+        # saving image first
+        super(Fit, self).save(*args, **kwargs)
 
         img = Image.open(self.image.path)  # Open image using self
 
@@ -43,7 +44,49 @@ class Fit(models.Model):
         return self.description[:10]
 
 
-"""class Top(models.Model):
-    style = models.CharField()
+class Top(models.Model):
+    brand = models.CharField(max_length=30, blank=True)
+    size = models.CharField(max_length=15, blank=True)
+    color = models.CharField(max_length=20, blank=True)
+    description = models.CharField(max_length=50, blank=True)
+    price = models.IntegerField(default=0)
+    fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.description[:10]
+
+
+class Bottom(models.Model):
+    brand = models.CharField(max_length=30)
     size = models.CharField(max_length=15)
-    color = models.CharField(max_length=20)"""
+    color = models.CharField(max_length=20)
+    description = models.CharField(max_length=50)
+    price = models.IntegerField()
+    fit = models.OneToOneField(Fit, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.description[:10]
+
+
+class Accessory(models.Model):
+    brand = models.CharField(max_length=30)
+    size = models.CharField(max_length=15)
+    color = models.CharField(max_length=20)
+    description = models.CharField(max_length=50)
+    price = models.IntegerField()
+    fit = models.ForeignKey(Fit, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.description[:10]
+
+
+class Shoe(models.Model):
+    brand = models.CharField(max_length=30)
+    size = models.CharField(max_length=15)
+    color = models.CharField(max_length=20)
+    description = models.CharField(max_length=50)
+    price = models.IntegerField()
+    fit = models.OneToOneField(Fit, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.description[:10]

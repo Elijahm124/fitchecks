@@ -1,11 +1,72 @@
-{% extends 'fits/base.html' %}
+{% extends 'fits/base_for_new_fit.html' %}
+{% load bootstrap4 %}
+
 
 {% block content %}
-    <p>New Fit: </p>
 
-    <form action="{% url 'fits:new_fit' owner %}" enctype="multipart/form-data" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button name="submit">Add Fit</button>
-    </form>
+<p>New Fit: </p>
+
+<form action="{% url 'fits:new_fit' owner %}" enctype="multipart/form-data" method="post"  >
+{% csrf_token %}
+{{ form.as_p }}
+
+<button type="submit" name="add_fit" value="add_fit" >Add Fit</button>
+</form>
+
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Add Top
+</button>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id='new_top' action=""  method="post" name="new_top">
+            <input type="hidden" name="new_top" value="new_top">
+        {% csrf_token %}
+        {{ form1.as_p }}
+            <button type="submit" class="btn btn-primary ">Save changes</button>
+        </form>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+          </div>
+
+
+
+<script type="text/javascript">
+    $(function () {
+    $('#new_top').on('submit',function (e) {
+            console.log("yes sir");
+
+              $.ajax({
+                type: 'post',
+                url: 'new_fit',
+                data: $('#new_top').serialize(),
+                success: function () {
+                 alert("Email has been sent!");
+                }
+              });
+          e.preventDefault();
+        });
+});
+</script>
+
+  </div>
+</div>
+</div>
+</div>
+
+
 {% endblock content %}

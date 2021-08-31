@@ -15,6 +15,9 @@
             <p>
                 {{ fit.shown_id }}
             </p>
+            <p>
+                {{ fit.top_set.all }}
+            </p>
     {% if same %}
         <button type="button">
         <a href="{% url 'fits:delete_fit' fit.owner fit.shown_id %}">Delete</a>

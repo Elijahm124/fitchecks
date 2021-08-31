@@ -1,5 +1,5 @@
 from django import forms
-from .models import Fit, Closet
+from .models import Fit, Closet, Top, Bottom, Accessory, Shoe
 
 
 class ClosetForm(forms.ModelForm):
@@ -29,3 +29,9 @@ class FitForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+
+
+class TopForm(forms.ModelForm):
+    class Meta:
+        model = Top
+        fields = ['brand', 'size', 'color', 'description', 'price']
