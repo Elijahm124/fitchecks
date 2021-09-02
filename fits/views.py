@@ -1,12 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404, reverse
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Closet, Fit, Top
 from users.models import Profile
 from .forms import ClosetForm, FitForm, TopForm
 from django.contrib.auth.models import User
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-import json
 
 
 def index(request):
@@ -121,7 +120,6 @@ def new_closet(request, owner):
 @login_required
 def new_fit(request, owner):
     """Create new Outfit"""
-    request.session['top_count'] = 0
 
     if owner != str(request.user):
         raise Http404
@@ -129,25 +127,20 @@ def new_fit(request, owner):
     context = {'owner': owner, }
     if request.method != 'POST':
         form = FitForm()
-        form1 = TopForm()
-        context.update({"form": form,
-                        "form1": form1})
+        top_form = TopForm()
+        context.update({"form": form, 'top_form': top_form})
+        request.session['top_count'] = 0
 
     if request.method == "POST" and "new_top" in request.POST:
 
-        form1 = TopForm(request.POST, initial=request.session.get('form_data'))
-        if form1.is_valid() and request.is_ajax():
-            print("top_added")
+        top_form = TopForm(data=request.POST)
+        if top_form.is_valid() and request.is_ajax():
             request.session['top_count'] += 1
-            request.session[f'form_data_{request.session["top_count"]}'] = form1.cleaned_data
-            form1 = TopForm()
+            request.session[f'form_data_{request.session[f"top_count"]}'] = top_form.cleaned_data
 
     if request.method == "POST" and "add_fit" in request.POST:
 
         form = FitForm(request.POST, request.FILES)
-
-        m = Top.objects.create(**request.session['form_data'])
-        print(m)
 
         if form.is_valid():
             new_fit = form.save(commit=False)
@@ -155,17 +148,19 @@ def new_fit(request, owner):
             main_closet.save()
 
             new_fit.owner = request.user
-
             new_fit.save()
+
             if request.session['top_count'] > 0:
-                for i in range(1, request.session['top_count']+1):
-                    new_fit.top_set.add(Top.objects.create(**request.session[f'form_data_{i}']))
+                for i in range(1, request.session['top_count'] + 1):
+                    top = Top.objects.create(**request.session[f'form_data_{i}'])
+                    new_fit.top_set.add(top)
             products = request.POST.getlist('closet')
             for product in products:
                 if Closet.objects.all().exists():
                     product = Closet.objects.get(pk=product)
                     new_fit.closet.add(product)
             new_fit.closet.add(main_closet)
+
             return redirect('fits:closets', owner=new_fit.owner)
 
     return render(request, 'fits/new_fit.html', context)
@@ -185,14 +180,36 @@ def delete_fit(request, shown_id, owner):
 
 @login_required
 def edit_fit(request, shown_id, owner):
+    context = {}
     if owner != str(request.user):
         raise Http404
     fit = get_object_or_404(Fit, shown_id=shown_id, owner__username=owner)
     if request.method != 'POST':
         form = FitForm(instance=fit)
+        if len(fit.top_set.all()) == 2:
+            top_form1 = TopForm(instance=fit.top_set.all()[0])
+            top_form2 = TopForm(instance=fit.top_set.all()[1])
+            context.update({"top_form1": top_form1, "top_form2": top_form2})
+        elif len(fit.top_set.all()) == 1:
+            top_form1 = TopForm(instance=fit.top_set.all()[0])
+            context.update({"top_form1": top_form1})
+
     else:
+        top_form1 = None
+        top_form2 = None
+        if len(fit.top_set.all()) == 2:
+            top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
+            top_form2 = TopForm(request.POST, instance=fit.top_set.all()[1])
+            context.update({"top_form1": top_form1, "top_form2": top_form2})
+        elif len(fit.top_set.all()) == 1:
+            top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
+            context.update({"top_form1": top_form1})
         form = FitForm(request.POST, request.FILES, instance=fit)
         if form.is_valid():
+            if top_form1 and top_form1.is_valid():
+                top_form1.save()
+            if top_form2 and top_form2.is_valid():
+                top_form2.save()
             edited_fit = form.save(commit=False)
             main_closet = Closet.objects.get(style__exact="main_closet", owner__username=owner)
             main_closet.save()
@@ -200,8 +217,53 @@ def edit_fit(request, shown_id, owner):
             edited_fit.save()
 
             return redirect('fits:closets', owner=fit.owner)
-    context = {'fit': fit, 'form': form}
+
+    context.update({'fit': fit, 'form': form})
     return render(request, 'fits/edit_fit.html', context)
+
+@login_required
+def edit_fit_elements(request, shown_id, owner):
+    if owner != str(request.user):
+        raise Http404
+    fit = get_object_or_404(Fit, shown_id=shown_id, owner__username=owner)
+    context = {"fit": fit}
+
+    if request.method == "POST":
+        top_form1 = None
+        top_form2 = None
+        print("post")
+        if len(fit.top_set.all()) == 2:
+            top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
+            top_form2 = TopForm(request.POST, instance=fit.top_set.all()[1])
+            context.update({"top_form1": top_form1, "top_form2": top_form2})
+        elif len(fit.top_set.all()) == 1:
+            top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
+            context.update({"top_form1": top_form1})
+
+        if top_form1 and top_form1.is_valid():
+            top_form1.save()
+            if top_form2 and top_form2.is_valid():
+                top_form2.save()
+            return redirect('fits:fit', owner=fit.owner, shown_id=shown_id)
+    elif request.GET.get('DeleteButton'):
+        element = get_object_or_404(Top, pk=request.GET.get('DeleteButton'))
+        element.delete()
+        return redirect('fits:edit_fit_elements', owner=fit.owner, shown_id=shown_id)
+
+    else:
+        if len(fit.top_set.all()) == 2:
+            top_1 = fit.top_set.all()[0]
+            top_form1 = TopForm(instance=top_1)
+
+            top_2 = fit.top_set.all()[1]
+            top_form2 = TopForm(instance=top_2)
+            context.update({"top_form1": top_form1, "top_form2": top_form2, "top_1": top_1, "top2": top_2})
+        elif len(fit.top_set.all()) == 1:
+            top_1 = fit.top_set.all()[0]
+            top_form1 = TopForm(instance=top_1)
+            context.update({"top_form1": top_form1, "top_1": top_1})
+
+    return render(request, 'fits/edit_fit_elements.html', context)
 
 
 @login_required

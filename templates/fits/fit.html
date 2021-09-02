@@ -15,15 +15,36 @@
             <p>
                 {{ fit.shown_id }}
             </p>
-            <p>
-                {{ fit.top_set.all }}
-            </p>
+            <ul>
+                {% for top in fit.top_set.all %}
+                    <li><p>Top</p>
+                    {% if top.description %}
+                        <p>Description: {{ top.description }}</p>
+                    {% endif %}
+                    {% if top.price %}
+                        <p>Price: {{ top.price }}</p>
+                    {% endif %}
+                    {% if top.brand %}
+                        <p>Brand: {{ top.brand }}</p>
+                    {% endif %}
+                    {% if top.size %}
+                        <p>Size: {{ top.size }}</p>
+                    {% endif %}
+                    {% if top.color %}
+                        <p>Color: {{ top.color }}</p>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
     {% if same %}
         <button type="button">
-        <a href="{% url 'fits:delete_fit' fit.owner fit.shown_id %}">Delete</a>
+        <a href="{% url 'fits:delete_fit' fit.owner fit.shown_id %}">Delete Fit</a>
         </button>
         <button type="button">
-        <a href="{% url 'fits:edit_fit' fit.owner fit.shown_id %}">Edit</a>
+        <a href="{% url 'fits:edit_fit' fit.owner fit.shown_id %}">Edit Fit</a>
+        </button>
+        <button type="button">
+        <a href="{% url 'fits:edit_fit_elements' fit.owner fit.shown_id %}">Edit Elements</a>
         </button>
     {% endif %}
 {% endblock content %}

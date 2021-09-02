@@ -13,19 +13,19 @@
 <button type="submit" name="add_fit" value="add_fit" >Add Fit</button>
 </form>
 
-
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    <button id="add-top-form" type="button" class="btn btn-primary" data-toggle="modal" data-target="#topModal">
   Add Top
 </button>
 
 
 
+
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="topModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Top</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -34,20 +34,22 @@
         <form id='new_top' action=""  method="post" name="new_top">
             <input type="hidden" name="new_top" value="new_top">
         {% csrf_token %}
-        {{ form1.as_p }}
-            <button type="submit" class="btn btn-primary ">Save changes</button>
-        </form>
+                {{ top_form.as_p }}
 
-          <div class="modal-footer">
+            <div class="modal-footer">
+            <button type="submit" class="btn btn-primary ">Save changes</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
           </div>
+        </form>
 
 
 
 <script type="text/javascript">
-    $(function () {
-    $('#new_top').on('submit',function (e) {
+    $(function (e) {
+        var count = 0;
+        $('#new_top').on('submit',function (e) {
+        e.preventDefault()
             console.log("yes sir");
 
               $.ajax({
@@ -55,10 +57,15 @@
                 url: 'new_fit',
                 data: $('#new_top').serialize(),
                 success: function () {
-                 alert("Email has been sent!");
+                 $('#topModal').modal('hide');
                 }
               });
-          e.preventDefault();
+        $("#new_top")[0].reset();
+        if (count > 0){
+            $("#add-top-form").hide();
+        }
+        else count= count+1;
+
         });
 });
 </script>

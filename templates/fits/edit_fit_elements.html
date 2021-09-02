@@ -1,0 +1,26 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+
+    <p>Edit Fit Elements</p>
+    <form action="{% url 'fits:edit_fit_elements' fit.owner fit.shown_id %}" method='post'> {% csrf_token %}
+        <div>
+    {{ top_form1.as_p }}
+    {{ top_form2.as_p }}
+
+            </div>
+
+    <button name="submit">Save changes</button>
+     </form>
+
+    <form action="" method="get">
+    <button class = "btn btn-default" name="DeleteButton" value="{{ top_1.id }}">Delete Top 1</button>
+    </form>
+
+
+    <form action="" method="get">
+    <button class = "btn btn-default" name="DeleteButton" value="{{ top_2.id }}">Delete Top 2</button>
+    </form>
+
+
+
+{% endblock content %}

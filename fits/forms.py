@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import modelformset_factory
 from .models import Fit, Closet, Top, Bottom, Accessory, Shoe
 
 
@@ -32,6 +33,16 @@ class FitForm(forms.ModelForm):
 
 
 class TopForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(TopForm, self).__init__(*args, **kwargs)
+        self.fields['price'].initial = ''
+
     class Meta:
         model = Top
         fields = ['brand', 'size', 'color', 'description', 'price']
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if not price:
+            price = 0
+        return price

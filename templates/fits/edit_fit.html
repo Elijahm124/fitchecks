@@ -6,7 +6,10 @@
 
     <p>Edit Fit</p>
     <form action="{% url 'fits:edit_fit' fit.owner fit.shown_id %}" method='post'> {% csrf_token %}
+        <div>
     {{ form.as_p }}
+            </div>
+
     <button name="submit">Save changes</button>
      </form>
 

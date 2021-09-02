@@ -22,6 +22,9 @@ class Profile(models.Model):
     gender = models.CharField(max_length=30, choices=gender_choices, blank=True)
     profile_pic = models.ImageField(upload_to='images/', blank=True)
 
+    class Meta:
+        unique_together = ["user", "bio", "profile_pic"]
+
     @property
     def get_profile_pic_url(self):
         if self.profile_pic and hasattr(self.profile_pic, 'url'):
