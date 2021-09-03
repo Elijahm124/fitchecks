@@ -36,6 +36,69 @@
                     </li>
                 {% endfor %}
             </ul>
+
+
+            {% if bottom %}
+            <p>Bottom</p>
+            {% endif %}
+            {% if bottom.description %}
+            <p>{{ bottom.description }}</p>
+            {% endif %}
+                {% if bottom.price %}
+            <p>{{ bottom.price }}</p>
+                {% endif %}
+            {% if bottom.brand %}
+            <p>{{ bottom.brand }}</p>
+                {% endif %}
+                {% if bottom.size %}
+            <p>{{ bottom.size }}</p>
+                {% endif %}
+            {% if bottom.color %}
+            <p>{{ bottom.color }}</p>
+                {% endif %}
+
+
+            {% if shoe %}
+            <p>Shoe</p>
+            {% endif %}
+            {% if shoe.description %}
+            <p>{{ shoe.description }}</p>
+            {% endif %}
+                {% if shoe.price %}
+            <p>{{ shoe.price }}</p>
+                {% endif %}
+            {% if shoe.brand %}
+            <p>{{ shoe.brand }}</p>
+                {% endif %}
+                {% if shoe.size %}
+            <p>{{ shoe.size }}</p>
+                {% endif %}
+            {% if shoe.color %}
+            <p>{{ shoe.color }}</p>
+                {% endif %}
+
+            <ul>
+                {% for accessory in fit.accessory_set.all %}
+                    <li><p>Accessory</p>
+                    {% if accessory.description %}
+                        <p>Description: {{ accessory.description }}</p>
+                    {% endif %}
+                    {% if accessory.price %}
+                        <p>Price: {{ accessory.price }}</p>
+                    {% endif %}
+                    {% if accessory.brand %}
+                        <p>Brand: {{ accessory.brand }}</p>
+                    {% endif %}
+                    {% if accessory.size %}
+                        <p>Size: {{ accessory.size }}</p>
+                    {% endif %}
+                    {% if accessory.color %}
+                        <p>Color: {{ accessory.color }}</p>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+
     {% if same %}
         <button type="button">
         <a href="{% url 'fits:delete_fit' fit.owner fit.shown_id %}">Delete Fit</a>
@@ -44,7 +107,10 @@
         <a href="{% url 'fits:edit_fit' fit.owner fit.shown_id %}">Edit Fit</a>
         </button>
         <button type="button">
-        <a href="{% url 'fits:edit_fit_elements' fit.owner fit.shown_id %}">Edit Elements</a>
+        <a href="{% url 'fits:edit_fit_elements' fit.owner fit.shown_id %}">Edit/Delete Elements</a>
+        </button>
+        <button type="button">
+        <a href="{% url 'fits:add_fit_elements' fit.owner fit.shown_id %}">Add Elements</a>
         </button>
     {% endif %}
 {% endblock content %}

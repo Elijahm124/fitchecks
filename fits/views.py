@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Closet, Fit, Top
+from .models import Closet, Fit, Top, Accessory, Bottom, Shoe
 from users.models import Profile
-from .forms import ClosetForm, FitForm, TopForm
+from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, BottomForm, AccessoryFormSet
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.db.models import Q
@@ -82,18 +82,34 @@ def closet(request, style, owner):
 
 
 def fit(request, owner, shown_id):
+    context = {}
     fit = Fit.objects.get(shown_id=shown_id, owner__username=owner)
+
+    try:
+        bottom = fit.bottom_set.all()[0]
+    except IndexError:
+        pass
+    else:
+        context.update({"bottom": bottom})
+
+    try:
+        shoe = fit.shoe_set.all()[0]
+    except IndexError:
+        pass
+    else:
+        context.update({"shoe": shoe})
+
     same = True
     if owner != str(request.user):
         if fit.private:
             raise Http404
         same = False
     owner = get_object_or_404(User, username=owner)
-    context = {
+    context.update({
         'fit': fit,
         'owner': owner,
         'same': same,
-    }
+    })
     return render(request, 'fits/fit.html', context)
 
 
@@ -128,15 +144,46 @@ def new_fit(request, owner):
     if request.method != 'POST':
         form = FitForm()
         top_form = TopForm()
-        context.update({"form": form, 'top_form': top_form})
+        bottom_form = BottomForm()
+        accessory_form = AccessoryForm()
+        shoe_form = ShoeForm()
+        context.update({"form": form,
+                        'top_form': top_form,
+                        "bottom_form": bottom_form,
+                        "accessory_form": accessory_form,
+                        'shoe_form': shoe_form})
         request.session['top_count'] = 0
+        request.session['shoe_count'] = 0
+        request.session['bottom_count'] = 0
+        request.session['accessory_count'] = 0
 
     if request.method == "POST" and "new_top" in request.POST:
 
         top_form = TopForm(data=request.POST)
         if top_form.is_valid() and request.is_ajax():
             request.session['top_count'] += 1
-            request.session[f'form_data_{request.session[f"top_count"]}'] = top_form.cleaned_data
+            request.session[f'top_form_{request.session[f"top_count"]}'] = top_form.cleaned_data
+
+    if request.method == "POST" and "new_bottom" in request.POST:
+
+        bottom_form = BottomForm(data=request.POST)
+        if bottom_form.is_valid() and request.is_ajax():
+            request.session["bottom_count"] += 1
+            request.session['bottom_form'] = bottom_form.cleaned_data
+
+    if request.method == "POST" and "new_shoe" in request.POST:
+
+        shoe_form = ShoeForm(data=request.POST)
+        if shoe_form.is_valid() and request.is_ajax():
+            request.session["shoe_count"] += 1
+            request.session['shoe_form'] = shoe_form.cleaned_data
+
+    if request.method == "POST" and "new_accessory" in request.POST:
+
+        accessory_form = AccessoryForm(data=request.POST)
+        if accessory_form.is_valid() and request.is_ajax():
+            request.session["accessory_count"] += 1
+            request.session[f'accessory_form_{request.session[f"accessory_count"]}'] = accessory_form.cleaned_data
 
     if request.method == "POST" and "add_fit" in request.POST:
 
@@ -152,8 +199,19 @@ def new_fit(request, owner):
 
             if request.session['top_count'] > 0:
                 for i in range(1, request.session['top_count'] + 1):
-                    top = Top.objects.create(**request.session[f'form_data_{i}'])
+                    top = Top.objects.create(**request.session[f'top_form_{i}'])
                     new_fit.top_set.add(top)
+            if request.session['bottom_count'] > 0:
+                bottom = Bottom.objects.create(**request.session['bottom_form'])
+                new_fit.bottom_set.add(bottom)
+            if request.session['shoe_count'] > 0:
+                shoe = Shoe.objects.create(**request.session['shoe_form'])
+                new_fit.shoe_set.add(shoe)
+            if request.session['accessory_count'] > 0:
+                for i in range(1, request.session['accessory_count'] + 1):
+                    accessory = Accessory.objects.create(**request.session[f'accessory_form_{i}'])
+                    new_fit.accessory_set.add(accessory)
+
             products = request.POST.getlist('closet')
             for product in products:
                 if Closet.objects.all().exists():
@@ -186,30 +244,10 @@ def edit_fit(request, shown_id, owner):
     fit = get_object_or_404(Fit, shown_id=shown_id, owner__username=owner)
     if request.method != 'POST':
         form = FitForm(instance=fit)
-        if len(fit.top_set.all()) == 2:
-            top_form1 = TopForm(instance=fit.top_set.all()[0])
-            top_form2 = TopForm(instance=fit.top_set.all()[1])
-            context.update({"top_form1": top_form1, "top_form2": top_form2})
-        elif len(fit.top_set.all()) == 1:
-            top_form1 = TopForm(instance=fit.top_set.all()[0])
-            context.update({"top_form1": top_form1})
 
     else:
-        top_form1 = None
-        top_form2 = None
-        if len(fit.top_set.all()) == 2:
-            top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
-            top_form2 = TopForm(request.POST, instance=fit.top_set.all()[1])
-            context.update({"top_form1": top_form1, "top_form2": top_form2})
-        elif len(fit.top_set.all()) == 1:
-            top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
-            context.update({"top_form1": top_form1})
         form = FitForm(request.POST, request.FILES, instance=fit)
         if form.is_valid():
-            if top_form1 and top_form1.is_valid():
-                top_form1.save()
-            if top_form2 and top_form2.is_valid():
-                top_form2.save()
             edited_fit = form.save(commit=False)
             main_closet = Closet.objects.get(style__exact="main_closet", owner__username=owner)
             main_closet.save()
@@ -221,6 +259,7 @@ def edit_fit(request, shown_id, owner):
     context.update({'fit': fit, 'form': form})
     return render(request, 'fits/edit_fit.html', context)
 
+
 @login_required
 def edit_fit_elements(request, shown_id, owner):
     if owner != str(request.user):
@@ -231,7 +270,11 @@ def edit_fit_elements(request, shown_id, owner):
     if request.method == "POST":
         top_form1 = None
         top_form2 = None
-        print("post")
+        bottom_form = None
+        shoe_form = None
+        accessory_formset = None
+        forms_valid = True
+
         if len(fit.top_set.all()) == 2:
             top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
             top_form2 = TopForm(request.POST, instance=fit.top_set.all()[1])
@@ -239,14 +282,54 @@ def edit_fit_elements(request, shown_id, owner):
         elif len(fit.top_set.all()) == 1:
             top_form1 = TopForm(request.POST, instance=fit.top_set.all()[0])
             context.update({"top_form1": top_form1})
+        if len(fit.bottom_set.all()) == 1:
+            bottom_form = BottomForm(request.POST, instance=fit.bottom_set.all()[0])
+            context.update({"bottom_form": bottom_form})
+        if len(fit.shoe_set.all()) == 1:
+            shoe_form = ShoeForm(request.POST, instance=fit.shoe_set.all()[0])
+            context.update({"shoe_form": shoe_form})
+        if len(fit.accessory_set.all()) > 0:
+            accessory_formset = AccessoryFormSet(request.POST, queryset=fit.accessory_set.all())
+            context.update({"accessory_formset": accessory_formset})
 
-        if top_form1 and top_form1.is_valid():
-            top_form1.save()
-            if top_form2 and top_form2.is_valid():
+        if top_form1:
+            if top_form1.is_valid():
+                top_form1.save()
+            else:
+                forms_valid = False
+        if top_form2:
+            if top_form2.is_valid():
                 top_form2.save()
+            else:
+                forms_valid = False
+        if bottom_form:
+            if bottom_form.is_valid():
+                bottom_form.save()
+            else:
+                forms_valid = False
+        if shoe_form:
+            if shoe_form.is_valid():
+                shoe_form.save()
+            else:
+                forms_valid = False
+        if accessory_formset:
+            if accessory_formset.is_valid():
+                accessory_formset.save()
+            else:
+                forms_valid = False
+
+        if forms_valid:
             return redirect('fits:fit', owner=fit.owner, shown_id=shown_id)
     elif request.GET.get('DeleteButton'):
-        element = get_object_or_404(Top, pk=request.GET.get('DeleteButton'))
+        element = None
+        if "top" in request.GET:
+            element = get_object_or_404(Top, pk=request.GET.get('DeleteButton'))
+        elif "bottom" in request.GET:
+            element = get_object_or_404(Bottom, pk=request.GET.get('DeleteButton'))
+        elif "shoe" in request.GET:
+            element = get_object_or_404(Shoe, pk=request.GET.get('DeleteButton'))
+        elif "accessory" in request.GET:
+            element = get_object_or_404(Accessory, pk=request.GET.get('DeleteButton'))
         element.delete()
         return redirect('fits:edit_fit_elements', owner=fit.owner, shown_id=shown_id)
 
@@ -262,6 +345,19 @@ def edit_fit_elements(request, shown_id, owner):
             top_1 = fit.top_set.all()[0]
             top_form1 = TopForm(instance=top_1)
             context.update({"top_form1": top_form1, "top_1": top_1})
+
+        if len(fit.bottom_set.all()) == 1:
+            bottom = fit.bottom_set.all()[0]
+            bottom_form = BottomForm(instance=bottom)
+            context.update({"bottom_form": bottom_form, "bottom": bottom})
+        if len(fit.shoe_set.all()) == 1:
+            shoe = fit.shoe_set.all()[0]
+            shoe_form = ShoeForm(instance=shoe)
+            context.update({"shoe_form": shoe_form, "shoe": shoe})
+        if len(fit.accessory_set.all()) > 0:
+            accessories = fit.accessory_set.all()
+            accessory_formset = AccessoryFormSet(queryset=accessories)
+            context.update({"accessory_formset": accessory_formset, "accessories": accessories})
 
     return render(request, 'fits/edit_fit_elements.html', context)
 
@@ -329,3 +425,76 @@ def add_fits(request, owner, style):
         'fits': fits
     }
     return render(request, 'fits/add_fits.html', context)
+
+
+@login_required
+def add_fit_elements(request, shown_id, owner):
+    if owner != str(request.user):
+        raise Http404
+    fit = get_object_or_404(Fit, shown_id=shown_id, owner__username=owner)
+    context = {"fit": fit}
+
+    if request.method != "POST":
+        request.session['top_count'] = len(fit.top_set.all())
+        request.session['shoe_count'] = len(fit.shoe_set.all())
+        request.session['bottom_count'] = len(fit.bottom_set.all())
+        request.session['accessory_count'] = len(fit.accessory_set.all())
+        context.update({"top_count": request.session['top_count'],
+                        "shoe_count": request.session['shoe_count'],
+                        "bottom_count": request.session['bottom_count'],
+                        "accessory_count": request.session['accessory_count']})
+        if request.session['top_count'] < 2:
+            top_form = TopForm()
+            context.update({
+                'top_form': top_form,
+            })
+        elif request.session['bottom_count'] == 0:
+            bottom_form = BottomForm()
+            context.update({
+                'bottom_form': bottom_form})
+        elif request.session['accessory_count'] < 6:
+            accessory_form = AccessoryForm()
+            context.update({
+                'accessory_form': accessory_form})
+        elif request.session['shoe_count'] == 0:
+            shoe_form = ShoeForm()
+            context.update({
+                'shoe_form': shoe_form})
+        else:
+            full_form = True
+            context.update({"full_form": full_form})
+
+    else:
+        if "new_top" in request.POST:
+
+            top_form = TopForm(data=request.POST)
+            if top_form.is_valid() and request.is_ajax():
+                top = Top.objects.create(top_form.cleaned_data)
+                fit.top_set.add(top)
+                request.session['top_count'] += 1
+
+        if "new_bottom" in request.POST:
+
+            bottom_form = BottomForm(data=request.POST)
+            if bottom_form.is_valid() and request.is_ajax():
+                bottom = Bottom.objects.create(bottom_form.cleaned_data)
+                fit.bottom_set.add(bottom)
+                request.session['bottom_count'] += 1
+
+        if "new_shoe" in request.POST:
+
+            shoe_form = ShoeForm(data=request.POST)
+            if shoe_form.is_valid() and request.is_ajax():
+                shoe = Shoe.objects.create(shoe_form.cleaned_data)
+                fit.shoe_set.add(shoe)
+                request.session['shoe_count'] += 1
+
+        if "new_accessory" in request.POST:
+
+            accessory_form = AccessoryForm(data=request.POST)
+            if accessory_form.is_valid() and request.is_ajax():
+                accessory = Accessory.objects.create(accessory_form.cleaned_data)
+                fit.shoe_set.add(accessory)
+                request.session['accessory_count'] += 1
+
+    return render(request, 'fits/add_fit_elements.html', context)

@@ -4,28 +4,35 @@
 
 {% block content %}
 
-<p>New Fit: </p>
+    <a href="{% url 'fits:fit' fit.owner fit.shown_id %}">
+        {{ fit.description }}
+    </a>
 
-<form action="{% url 'fits:new_fit' owner %}" enctype="multipart/form-data" method="post"  >
-{% csrf_token %}
-{{ form.as_p }}
-
-<button type="submit" name="add_fit" value="add_fit" >Add Fit</button>
-</form>
-
+<p>Add Fit Elements </p>
+    {% if not full_form %}
+    {% if top_count < 2 %}
     <button id="add-top-form" type="button" class="btn btn-primary" data-toggle="modal" data-target="#topModal">
   Add Top
 </button>
+    {% endif %}
+    {% if bottom_count == 0 %}
     <button id="add-bottom-form" type="button" class="btn btn-primary" data-toggle="modal" data-target="#bottomModal">
   Add Bottom
 </button>
+    {% endif %}
+    {% if shoe_count == 0 %}
     <button id="add-shoe-form" type="button" class="btn btn-primary" data-toggle="modal" data-target="#shoeModal">
   Add Shoe
 </button>
+    {% endif %}
+    {% if accessory_count < 6 %}
     <button id="add-accessory-form" type="button" class="btn btn-primary" data-toggle="modal" data-target="#accessoryModal">
   Add Accessory
 </button>
-
+    {% endif %}
+    {% else %}
+    <p>No more elements can be added, try deleting some</p>
+    {% endif %}
 
 
 
@@ -56,7 +63,6 @@
 
 <script type="text/javascript">
     $(function (e) {
-        var count = 0;
         $('#new_top').on('submit',function (e) {
         e.preventDefault()
 
@@ -72,7 +78,6 @@
         if (count > 0){
             $("#add-top-form").hide();
         }
-        else count= count+1;
 
         });
 });

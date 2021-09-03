@@ -4,22 +4,74 @@
     <p>Edit Fit Elements</p>
     <form action="{% url 'fits:edit_fit_elements' fit.owner fit.shown_id %}" method='post'> {% csrf_token %}
         <div>
+            {% if top_form1 %}
+            <p>Top 1</p>
+            {% endif %}
     {{ top_form1.as_p }}
+            {% if top_form12 %}
+            <p>Top 2</p>
+            {% endif %}
     {{ top_form2.as_p }}
+        {% if bottom_form %}
+            <p>Bottom</p>
+            {% endif %}
+    {{ bottom_form.as_p }}
+        {% if shoe_form %}
+            <p>Shoe</p>
+            {% endif %}
+    {{ shoe_form.as_p }}
+
+        {% if accessory_formset %}
+        {{accessory_formset.management_form}}
+        {% for accessory_form in accessory_formset %}
+            <p>Accessory</p>
+            {{ accessory_form.as_p }}
+        {% endfor %}
+        {% endif %}
+
 
             </div>
 
     <button name="submit">Save changes</button>
      </form>
 
+    {% if top_form1 %}
     <form action="" method="get">
     <button class = "btn btn-default" name="DeleteButton" value="{{ top_1.id }}">Delete Top 1</button>
+        <input type="hidden" name="top" value="top">
     </form>
+    {% endif %}
 
-
+    {% if top_form2 %}
     <form action="" method="get">
     <button class = "btn btn-default" name="DeleteButton" value="{{ top_2.id }}">Delete Top 2</button>
+        <input type="hidden" name="top" value="top">
     </form>
+    {% endif %}
+
+    {% if bottom_form %}
+    <form action="" method="get">
+    <button class = "btn btn-default" name="DeleteButton" value="{{ bottom.id }}">Delete Bottom</button>
+        <input type="hidden" name="bottom" value="bottom">
+    </form>
+    {% endif %}
+
+    {% if shoe_form %}
+    <form action="" method="get">
+    <button class = "btn btn-default" name="DeleteButton" value="{{ shoe.id }}">Delete Shoe</button>
+        <input type="hidden" name="shoe" value="shoe">
+    </form>
+    {% endif %}
+
+    {% if accessory_formset %}
+        {% for accessory in accessories %}
+            <form action="" method="get">
+            <button class = "btn btn-default" name="DeleteButton" value="{{ accessory.id }}">Delete Accessory</button>
+                <input type="hidden" name="accessory" value="accessory">
+            </form>
+        {% endfor %}
+    {% endif %}
+
 
 
 

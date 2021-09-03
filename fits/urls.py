@@ -15,6 +15,7 @@ urlpatterns = [
     path('<owner>/<shown_id>/delete', views.delete_fit, name='delete_fit'),
     path('<owner>/<shown_id>/edit_fit', views.edit_fit, name='edit_fit'),
     path('<owner>/<shown_id>/edit_fit_elements', views.edit_fit_elements, name='edit_fit_elements'),
+    path('<owner>/<shown_id>/add_fit_elements', views.add_fit_elements, name='add_fit_elements'),
     path('<owner>/closets/<style>/remove', views.remove_fits, name='remove_fits'),
     path('<owner>/closets/<style>/add', views.add_fits, name="add_fits"),
     path('<owner>/closets/<style>/edit', views.edit_closet, name='edit_closet'),

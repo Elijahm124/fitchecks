@@ -46,3 +46,56 @@ class TopForm(forms.ModelForm):
         if not price:
             price = 0
         return price
+
+
+class BottomForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(BottomForm, self).__init__(*args, **kwargs)
+        self.fields['price'].initial = ''
+
+    class Meta:
+        model = Bottom
+        fields = ['brand', 'size', 'color', 'description', 'price']
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if not price:
+            price = 0
+        return price
+
+
+class ShoeForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ShoeForm, self).__init__(*args, **kwargs)
+        self.fields['price'].initial = ''
+
+    class Meta:
+        model = Shoe
+        fields = ['brand', 'size', 'color', 'description', 'price']
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if not price:
+            price = 0
+        return price
+
+
+class AccessoryForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AccessoryForm, self).__init__(*args, **kwargs)
+        self.fields['price'].initial = ''
+
+    class Meta:
+        model = Accessory
+        fields = ['brand', 'size', 'color', 'description', 'price']
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if not price:
+            price = 0
+        return price
+
+
+AccessoryFormSet = modelformset_factory(
+    Accessory, fields=('brand', 'size', 'color', 'description', 'price'), extra=0
+)

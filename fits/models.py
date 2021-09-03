@@ -46,7 +46,6 @@ class Fit(models.Model):
             img.thumbnail(new_img)
             img.save(self.image.path, quality=100)
 
-
     def __str__(self):
         return self.description[:10]
 
@@ -55,7 +54,7 @@ class Top(models.Model):
     brand = models.CharField(max_length=30, blank=True)
     size = models.CharField(max_length=15, blank=True)
     color = models.CharField(max_length=20, blank=True)
-    description = models.CharField(max_length=50, blank=True)
+    description = models.CharField(max_length=50)
     price = models.IntegerField(default=0, blank=True)
     fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
@@ -67,12 +66,12 @@ class Top(models.Model):
 
 
 class Bottom(models.Model):
-    brand = models.CharField(max_length=30)
-    size = models.CharField(max_length=15)
-    color = models.CharField(max_length=20)
+    brand = models.CharField(max_length=30, blank=True)
+    size = models.CharField(max_length=15, blank=True)
+    color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
     price = models.IntegerField(default=0, blank=True)
-    fit = models.OneToOneField(Fit, on_delete=models.CASCADE, blank=True, null=True)
+    fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         unique_together = ["brand", "description", "color", "price", "fit"]
@@ -82,12 +81,12 @@ class Bottom(models.Model):
 
 
 class Accessory(models.Model):
-    brand = models.CharField(max_length=30)
-    size = models.CharField(max_length=15)
-    color = models.CharField(max_length=20)
+    brand = models.CharField(max_length=30, blank=True)
+    size = models.CharField(max_length=15, blank=True)
+    color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
-    price = models.IntegerField()
-    fit = models.ForeignKey(Fit, on_delete=models.CASCADE)
+    price = models.IntegerField(default=0, blank=True)
+    fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         unique_together = ["brand", "description", "color", "price", "fit"]
@@ -97,12 +96,12 @@ class Accessory(models.Model):
 
 
 class Shoe(models.Model):
-    brand = models.CharField(max_length=30)
-    size = models.CharField(max_length=15)
-    color = models.CharField(max_length=20)
+    brand = models.CharField(max_length=30, blank=True)
+    size = models.CharField(max_length=15, blank=True)
+    color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
-    price = models.IntegerField()
-    fit = models.OneToOneField(Fit, on_delete=models.CASCADE)
+    price = models.IntegerField(default=0, blank=True)
+    fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         unique_together = ["brand", "description", "color", "price", "fit"]
