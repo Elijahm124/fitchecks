@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
+from django_countries.fields import CountryField
 
 gender_choices = [
     ('Male', "Male"),
@@ -19,6 +20,7 @@ class Profile(models.Model):
 
     weight = models.IntegerField(blank=True, default=0)
     height = models.IntegerField(blank=True, default=0)
+    country = CountryField(blank=True)
     gender = models.CharField(max_length=30, choices=gender_choices, blank=True)
     profile_pic = models.ImageField(upload_to='images/', blank=True)
 

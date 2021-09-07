@@ -4,9 +4,11 @@
 
     <p>{{ owner.username }}'s Closets</p><br>
     <p>{{ owner.profile.bio }}</p>
+    <img src="{{ owner.profile.country.flag}}" alt="{{ owner.profile.country.alpha3 }}">
     <img
                 src="{{ owner.profile.get_profile_pic_url }}" alt="img"
             >
+
 
     {% if not same %}
         <!--console.log("not same")-->

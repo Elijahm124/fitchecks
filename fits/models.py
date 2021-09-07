@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
 import uuid
+from djmoney.models.fields import MoneyField
 
 
 class Closet(models.Model):
@@ -55,7 +56,7 @@ class Top(models.Model):
     size = models.CharField(max_length=15, blank=True)
     color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
-    price = models.IntegerField(default=0, blank=True)
+    price = MoneyField(max_digits=14, decimal_places=2, blank=True, null=True)
     fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
@@ -70,7 +71,7 @@ class Bottom(models.Model):
     size = models.CharField(max_length=15, blank=True)
     color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
-    price = models.IntegerField(default=0, blank=True)
+    price = MoneyField(max_digits=14, decimal_places=2, blank=True, null=True)
     fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
@@ -85,7 +86,7 @@ class Accessory(models.Model):
     size = models.CharField(max_length=15, blank=True)
     color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
-    price = models.IntegerField(default=0, blank=True)
+    price = MoneyField(max_digits=14, decimal_places=2, blank=True, null=True)
     fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
@@ -100,7 +101,7 @@ class Shoe(models.Model):
     size = models.CharField(max_length=15, blank=True)
     color = models.CharField(max_length=20, blank=True)
     description = models.CharField(max_length=50)
-    price = models.IntegerField(default=0, blank=True)
+    price = MoneyField(max_digits=14, decimal_places=2, blank=True, null=True)
     fit = models.ForeignKey(Fit, on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
