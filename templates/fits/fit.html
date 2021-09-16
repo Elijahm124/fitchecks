@@ -1,4 +1,8 @@
 {% extends 'fits/base.html' %}
+{% load static %}
+
+{% block cssfiles %}
+{% endblock cssfiles %}
 {% block content %}
     <img
                 src="{{ fit.image.url }}" alt="img"
@@ -12,9 +16,36 @@
             <p>
                 {{ fit.date_added|date:'M d, Y' }}
             </p>
-            <p>
-                {{ fit.shown_id }}
-            </p>
+        <h4>Comments</h4>
+
+            <form action = "" method = "post">
+                {% csrf_token %}
+                    {{ form.as_p }}
+                <div>
+                    <button class="btn btn-lg btn-primary btn-block text-uppercase" name="submit">Comment</button><br>
+                </div>
+            </form>
+
+    <div class="row">
+	    	<div class="col-md-8">
+	    		{% if fit.details.all %}
+	    		<div class="card card-signin my-5">
+	    		{% for detail in fit.details.all %}
+	    			<div class="card-body">
+	    				<a href="{% url 'fits:closets' detail.username %}">
+	    					<img src="/{{ detail.username.profile.get_profile_pic_url}}" class="rounded-circle" width="30" height="30" alt="">
+	    				</a>
+	          			<a class="text-dark" href="{% url 'fits:closets' detail.username %}"><b>{{ detail.username }}</b></a>
+	          			<br><small>{{ detail.comment_date }}</small><br>
+	          			<p class="card-text text-dark">{{ detail.comment }}</p>
+	    			</div>
+	    		{% endfor %}
+	    		</div>
+	    		{% else %}
+	    			<p>No comments to show!</p>
+	    		{% endif %}
+	    	</div>
+    </div>
             <ul>
                 {% for top in fit.top_set.all %}
                     <li><p>Top</p>

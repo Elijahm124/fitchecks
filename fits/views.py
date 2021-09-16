@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Closet, Fit, Top, Accessory, Bottom, Shoe
 from users.models import Profile
-from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, BottomForm, AccessoryFormSet
+from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, BottomForm, AccessoryFormSet, CommentForm
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.db.models import Q
@@ -104,11 +104,23 @@ def fit(request, owner, shown_id):
         if fit.private:
             raise Http404
         same = False
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            data = form.save(commit=False)
+            data.fit = fit
+            data.username = request.user
+            data.save()
+            return redirect('fits:fit', owner=fit.owner, shown_id=shown_id)
+    else:
+        form = CommentForm()
+
     owner = get_object_or_404(User, username=owner)
     context.update({
         'fit': fit,
         'owner': owner,
         'same': same,
+        'form': form,
     })
     return render(request, 'fits/fit.html', context)
 

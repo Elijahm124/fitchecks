@@ -109,3 +109,15 @@ class Shoe(models.Model):
 
     def __str__(self):
         return self.description[:10]
+
+
+class Comment(models.Model):
+    fit = models.ForeignKey(Fit, related_name='details', on_delete=models.CASCADE)
+    username = models.ForeignKey(User, related_name='details', on_delete=models.CASCADE)
+    comment = models.CharField(max_length=255)
+    comment_date = models.DateTimeField(auto_now_add=True)
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
+    fit = models.ForeignKey(Fit, related_name='likes', on_delete=models.CASCADE)

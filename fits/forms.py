@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import modelformset_factory
-from .models import Fit, Closet, Top, Bottom, Accessory, Shoe
+from .models import Fit, Closet, Top, Bottom, Accessory, Shoe, Comment
 
 
 class ClosetForm(forms.ModelForm):
@@ -54,6 +54,12 @@ class AccessoryForm(forms.ModelForm):
     class Meta:
         model = Accessory
         fields = ['brand', 'size', 'color', 'description', 'price']
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
 
 
 AccessoryFormSet = modelformset_factory(
