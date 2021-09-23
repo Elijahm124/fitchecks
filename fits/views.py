@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Closet, Fit, Top, Accessory, Bottom, Shoe
+from .models import Closet, Fit, Top, Accessory, Bottom, Shoe, Like
 from users.models import Profile
 from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, BottomForm, AccessoryFormSet, CommentForm
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+import json
+from django.db.models import F
 
 
 def index(request):
@@ -20,6 +22,9 @@ def index(request):
 def all(request):
     fits = Fit.objects.filter(private=False)
     context = {'fits': fits}
+    if request.user.is_authenticated:
+        liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
+        context['liked_post'] = liked
     return render(request, 'fits/all.html', context)
 
 
@@ -510,3 +515,26 @@ def add_fit_elements(request, shown_id, owner):
                 request.session['accessory_count'] += 1
 
     return render(request, 'fits/add_fit_elements.html', context)
+
+
+@login_required
+def like(request):
+    fit_id = request.GET.get("likeId", "")
+    user = request.user
+    fit = Fit.objects.get(pk=fit_id)
+    liked = False
+    like = Like.objects.filter(user=user, fit=fit)
+    if like:
+        like.delete()
+        like_count = fit.likes.count()
+
+    else:
+        liked = True
+        Like.objects.create(user=user, fit=fit)
+        like_count = fit.likes.count()
+    resp = {
+        'liked': liked,
+        "like_amount": like_count,
+    }
+    response = json.dumps(resp)
+    return HttpResponse(response, content_type="application/json")

@@ -5,6 +5,7 @@ app_name = 'fits'
 urlpatterns = [
     path('', views.index, name='index'),
     path('all', views.all, name="all"),
+    path('like', views.like, name='like_fit'),
     path('<owner>/new_fit', views.new_fit, name='new_fit'),
     path('<owner>/closets', views.closets, name='closets'),
     path('<owner>', views.closets, name="closets"),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('<owner>/closets/<style>/remove', views.remove_fits, name='remove_fits'),
     path('<owner>/closets/<style>/add', views.add_fits, name="add_fits"),
     path('<owner>/closets/<style>/edit', views.edit_closet, name='edit_closet'),
+
 
 
 
