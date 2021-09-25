@@ -7,16 +7,30 @@ from django.http import Http404, HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 import json
-from django.db.models import F
 
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect("fits:feed")
+
+    return render(request, 'fits/index.html')
+
+
+def feed(request):
+    context = {}
     if not request.user.is_authenticated:
         return redirect("fits:all")
+
+    else:
+        liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
+        context['liked_post'] = liked
     followed_people = request.user.profile.following.all()
-    fits = Fit.objects.filter(owner__profile__in=followed_people, private=False)
-    context = {'fits': fits}
-    return render(request, 'fits/index.html', context)
+    fits = Fit.objects.filter(owner__profile__in=followed_people, private=False) | \
+           Fit.objects.filter(owner__username=request.user)
+
+    context.update({'fits': fits})
+
+    return render(request, 'fits/feed.html', context)
 
 
 def all(request):
@@ -89,6 +103,9 @@ def closet(request, style, owner):
 def fit(request, owner, shown_id):
     context = {}
     fit = Fit.objects.get(shown_id=shown_id, owner__username=owner)
+    if request.user.is_authenticated:
+        liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
+        context['liked_post'] = liked
 
     try:
         bottom = fit.bottom_set.all()[0]

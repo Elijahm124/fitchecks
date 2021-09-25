@@ -4,6 +4,7 @@ from . import views
 app_name = 'fits'
 urlpatterns = [
     path('', views.index, name='index'),
+    path('feed', views.feed, name="feed"),
     path('all', views.all, name="all"),
     path('like', views.like, name='like_fit'),
     path('<owner>/new_fit', views.new_fit, name='new_fit'),

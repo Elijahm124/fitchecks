@@ -10,7 +10,6 @@
 <p>FitChecks is your own virtual closet, where you can store
 specific outfits, and see other people's outfits and use it as inspiration</p>
     <p>Fits:</p>
-    {% if fits %}
     <ul>
     {% for fit in fits %}
         <li>
@@ -26,12 +25,8 @@ specific outfits, and see other people's outfits and use it as inspiration</p>
 			            <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}"> Unlike</a> |
 
 
-
 			        {% else %}
 			            <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}"> Like</a> |
-
-
-
 
 
 
@@ -41,19 +36,12 @@ specific outfits, and see other people's outfits and use it as inspiration</p>
 
 
 			    </button>
-
-
-
-
-
         </div>
     {% empty %}
         <li>There are no fits yet</li>
     {% endfor %}
     </ul>
-    {% endif %}
 {% endblock content%}
-
 
 {% block jsfiles %}
 <script>
@@ -95,5 +83,3 @@ specific outfits, and see other people's outfits and use it as inspiration</p>
     });
 </script>
 {% endblock jsfiles %}
-
-

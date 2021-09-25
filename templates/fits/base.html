@@ -1,36 +1,110 @@
-<p>
-    <a href="{% url 'fits:index' %}">
-        FitChecks
+{% load bootstrap4 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+        shrink-to-fit=no">
+    <title>Fitchecks</title>
+
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery="full" %}
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-light bg-light mb-4 border">
+        {% if user.is_authenticated %}
+        <a class="navbar-brand" href="{% url 'fits:all' %}">
+            FitChecks</a>
+        {% else %}
+            <a class="navbar-brand" href="{% url 'fits:index' %}">
+            FitChecks</a>
+        {% endif %}
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarCollapse" aria-controls="navbarCollapse"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+          <li class="nav-item">
+          <a class="nav-link" href="{% url 'fits:index' %}">
+        Your Feed
+
+
     </a>
-</p>
-<p>
-{% if user.is_authenticated %}
-    Hello, {{ user.username }}.
-    <a href="{% url 'users:logout' %}">
-        Log Out
-    </a>
-    <a
-        href="{% url 'fits:closets' user %}">
+          </li>
+                    <li class="nav-item">
+              <a class="nav-link" href="{% url 'fits:closets' user %}">
         Your Closet(s)
     </a>
-    <a href="{% url 'fits:new_closet' user %}">
+              </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="{% url 'fits:single_closet' user 'main_closet' %}">Your Fits</a>
+                    </li>
+                                  {% else %}
+                    <li class="nav-item">
+          <a class="nav-link" href="{% url 'fits:all' %}">
+        Explore
+
+    </a>
+
+                {% endif %}
+                    </ul>
+
+
+            <ul class="navbar-nav ml-auto">
+      {% if user.is_authenticated %}
+        <li class="nav-item">
+          <span class="navbar-text">Hello, {{ user.username }}.</span>
+        </li>
+          <li class="nav-item">
+    <a class="nav-link" href="{% url 'fits:new_closet' user %}">
         New Closet
     </a>
-    <a href="{% url 'fits:new_fit' user %}">
+          </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'fits:new_fit' user %}">
         New Fit
     </a>
-{% else %}
-    <a href="{% url 'users:register' %}">
-        Register
-    </a> -
-    <a href="{% url 'users:login' %}">
-        Log In
-    </a>
-{% endif %}
-</p>
+          </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:logout' %}">Log out</a>
+        </li>
 
-{% block content %}{% endblock content %}
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:register' %}">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:login' %}">Log in</a></li>
+      {% endif %}
+    </ul>
+
+
+
+        </div>
+
+    </nav>
+
+
+
+    <main role="main" class="container">
+        <div class="pb-2 mb-2 border-bottom">
+            {% block page_header %}{% endblock page_header %}
+        </div>
+        <div>
+            {% block content %}{% endblock content %}
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     {% block jsfiles %}{% endblock jsfiles %}
+        </div>
+    </main>
+</body>
+
+</html>
