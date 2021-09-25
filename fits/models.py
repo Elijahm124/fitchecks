@@ -121,3 +121,4 @@ class Comment(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
     fit = models.ForeignKey(Fit, related_name='likes', on_delete=models.CASCADE)
+    like_date = models.DateTimeField(auto_now_add=True)

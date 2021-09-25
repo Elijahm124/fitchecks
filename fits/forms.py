@@ -15,7 +15,7 @@ class ClosetForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(ClosetForm, self).clean()
         sty = self.cleaned_data.get('style')
-        if sty in ['main_closet', 'new_closet']:
+        if sty in ['main_closet', 'new_closet', 'liked_fits']:
             raise forms.ValidationError(f'Cannot name closet {sty}')
         return cleaned_data
 
@@ -25,8 +25,9 @@ class FitForm(forms.ModelForm):
         model = Fit
         fields = ['description', 'image', 'tags', 'closet', 'private']
 
+    lst = ["main_closet", "liked_fits"]
     closet = forms.ModelMultipleChoiceField(
-        queryset=Closet.objects.exclude(style__exact='main_closet'),
+        queryset=Closet.objects.exclude(style__in=lst),
         widget=forms.CheckboxSelectMultiple,
         required=False
     )

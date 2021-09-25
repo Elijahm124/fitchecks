@@ -81,7 +81,10 @@ def closets(request, owner):
 
 
 def closet(request, style, owner):
+
     closet = Closet.objects.get(style=style, owner__username=owner)
+    if closet.style == "liked_fits":
+        return redirect("fits:liked_fits", owner)
     same = True
     if owner == str(request.user):
         fits = closet.fit_set.order_by('-date_added')
@@ -90,7 +93,9 @@ def closet(request, style, owner):
             raise Http404
         same = False
         fits = closet.fit_set.filter(private=False).order_by('-date_added')
+
     owner = get_object_or_404(User, username=owner)
+
     context = {
         'closet': closet,
         'fits': fits,
@@ -400,7 +405,8 @@ def edit_fit_elements(request, shown_id, owner):
 def edit_closet(request, owner, style):
     if owner != str(request.user):
         raise Http404
-    closet = get_object_or_404(Closet, ~Q(style='main_closet'), style=style, owner__username=owner)
+    closet = get_object_or_404(Closet, ~Q(style='main_closet'), ~Q(style='liked_fits'), style=style,
+                               owner__username=owner)
     if request.method != 'POST':
         form = ClosetForm(instance=closet)
     else:
@@ -416,7 +422,8 @@ def edit_closet(request, owner, style):
 def delete_closet(request, owner, style):
     if owner != str(request.user):
         raise Http404
-    closet = get_object_or_404(Closet, ~Q(style='main_closet'), owner__username=owner, style=style)
+    closet = get_object_or_404(Closet, ~Q(style='main_closet'), ~Q(style='liked_fits'), owner__username=owner,
+                               style=style)
     if request.method == "POST":
         closet.delete()
         return redirect('fits:closets', owner=closet.owner)
@@ -428,7 +435,8 @@ def delete_closet(request, owner, style):
 def remove_fits(request, style, owner):
     if owner != str(request.user):
         raise Http404
-    closet = get_object_or_404(Closet, ~Q(style='main_closet'), owner__username=owner, style=style)
+    closet = get_object_or_404(Closet, ~Q(style='main_closet'), ~Q(style='liked_fits'), owner__username=owner,
+                               style=style)
     fits = closet.fit_set.order_by('-date_added')
     if request.GET.get('DeleteButton'):
         closet.fit_set.remove(request.GET.get('DeleteButton'))
@@ -444,7 +452,8 @@ def remove_fits(request, style, owner):
 def add_fits(request, owner, style):
     if owner != str(request.user):
         raise Http404
-    curr_closet = get_object_or_404(Closet, ~Q(style='main_closet'), style=style, owner__username=owner)
+    curr_closet = get_object_or_404(Closet, ~Q(style='main_closet'), ~Q(style='liked_fits'), style=style,
+                                    owner__username=owner)
     main_closet = Closet.objects.get(style='main_closet', owner__username=owner)
     curr_fits = curr_closet.fit_set.all()
     main_fits = main_closet.fit_set.all()
@@ -555,3 +564,14 @@ def like(request):
     }
     response = json.dumps(resp)
     return HttpResponse(response, content_type="application/json")
+
+
+def liked_fits(request, owner):
+    liked_outfits = Fit.objects.filter(likes__user__username=owner).order_by('-date_added')
+
+    owner = get_object_or_404(User, username=owner)
+    context = {
+        'liked_fits': liked_outfits,
+        'owner': owner,
+    }
+    return render(request, 'fits/liked_fits.html', context)

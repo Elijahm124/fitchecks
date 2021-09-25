@@ -1,0 +1,22 @@
+{% extends 'fits/base.html' %}
+{% block content %}
+
+    <p>Liked Fits</p>
+
+
+    <p>Fits:</p>
+    <ul>
+    {% for outfit in liked_fits %}
+        <li>
+            <a href="{% url 'fits:fit' outfit.owner outfit.shown_id %}">
+            <img
+                src="{{ outfit.image.url }}" alt="img"
+            >
+                </a>
+        </li>
+    {% empty %}
+        <li>There are no Liked fits for {{ owner }} yet</li>
+    {% endfor %}
+    </ul>
+
+{% endblock content %}

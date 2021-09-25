@@ -1,23 +1,17 @@
 {% extends 'fits/base.html' %}
+{% load static %}
+{% block cssfiles %}
+{% endblock cssfiles %}
+
+{% block page_header %}
+<div class="jumbotron">
+<h1 class="display-3">See, share, and check fits</h1>
+<p class="lead">FitChecks is the premier clothing website. You get inspiration for entire fits, and can share
+each aspect of a fit, or don't, you can also just keep track of your favorite outfits and how they look. </p>
+<a class="btn btn-lg btn-primary" href="{% url 'users:register' %}" role="button">Register &raquo;</a>
+</div>
+{% endblock page_header %}
 
 {% block content %}
 
-    {% include 'fits/base_home_page.html' %}
-
-<p>FitChecks is your own virtual closet, where you can store
-specific outfits, and see other people's outfits and use it as inspiration</p>
-    <p>Fits:</p>
-    <ul>
-    {% for fit in fits %}
-        <li>
-            <a href="{% url 'fits:fit' fit.owner fit.shown_id %}">
-            <img
-                src="{{ fit.image.url }}" alt="img"
-            >
-                </a>
-        </li>
-    {% empty %}
-        <li>There are no fits yet</li>
-    {% endfor %}
-    </ul>
-{% endblock content%}
+{% endblock content %}
