@@ -29,6 +29,32 @@ def feed(request):
            Fit.objects.filter(owner__username=request.user)
 
     context.update({'fits': fits})
+    for fit in fits:
+
+        if fit.owner != str(request.user) and request.user.is_authenticated:
+            print("not same")
+            same = False
+            curr_user = request.user.profile
+            followee = Profile.objects.get(user__username=fit.owner)
+            follower = followee.followers.all()
+            if curr_user not in follower:
+                is_following = False
+                if request.method == "POST":
+                    print("follow")
+                    curr_user.following.add(followee)
+                    followee.followers.add(curr_user)
+                    is_following = True
+            else:
+                is_following = True
+                if request.method == "POST":
+                    print("unfollowed")
+                    curr_user.following.remove(followee)
+                    followee.followers.remove(curr_user)
+                    is_following = False
+            context.update({'curr_user': curr_user,
+                            'followee': followee,
+                            'is_following': is_following,
+                            'same': same})
 
     return render(request, 'fits/feed.html', context)
 
@@ -39,6 +65,32 @@ def all(request):
     if request.user.is_authenticated:
         liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
         context['liked_post'] = liked
+    same = True
+    for fit in fits:
+        if fit.owner != str(request.user) and request.user.is_authenticated:
+            print("not same")
+            same = False
+            curr_user = request.user.profile
+            followee = Profile.objects.get(user__username=fit.owner)
+            follower = followee.followers.all()
+            if curr_user not in follower:
+                is_following = False
+                if request.method == "POST":
+                    print("follow")
+                    curr_user.following.add(followee)
+                    followee.followers.add(curr_user)
+                    is_following = True
+            else:
+                is_following = True
+                if request.method == "POST":
+                    print("unfollowed")
+                    curr_user.following.remove(followee)
+                    followee.followers.remove(curr_user)
+                    is_following = False
+            context.update({'curr_user': curr_user,
+                            'followee': followee,
+                            'is_following': is_following,
+                            'same': same})
     return render(request, 'fits/all.html', context)
 
 

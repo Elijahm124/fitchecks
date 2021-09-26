@@ -1,3 +1,5 @@
+import uuid
+
 from django import forms
 from django.forms import modelformset_factory
 from .models import Fit, Closet, Top, Bottom, Accessory, Shoe, Comment
@@ -23,6 +25,7 @@ class ClosetForm(forms.ModelForm):
 class FitForm(forms.ModelForm):
     class Meta:
         model = Fit
+        model.shown_id = uuid.uuid4()
         fields = ['description', 'image', 'tags', 'closet', 'private']
 
     lst = ["main_closet", "liked_fits"]

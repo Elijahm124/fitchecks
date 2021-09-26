@@ -7,40 +7,66 @@
 
 
 
-<p>FitChecks is your own virtual closet, where you can store
-specific outfits, and see other people's outfits and use it as inspiration</p>
-    <p>Fits:</p>
-    <ul>
-    {% for fit in fits %}
-        <li>
-            <a href="{% url 'fits:fit' fit.owner fit.shown_id %}">
-            <img
-                src="{{ fit.image.url }}" alt="img"
-            >
-                </a>
-        </li>
-        <div class="card-footer">
-        <button class="btn btn-white mr-3 like" id="{{ fit.id }}">
-			        {% if fit in liked_post %}
-			            <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}"> Unlike</a> |
+
+<h4>FitChecks - Your own virtual closet</h4>
+<div class="container">
+<div class="row">
+
+{% for fit in fits %}
+
+    <div class="col-xs-1">
+        <div class="card bg-transparent mx-auto my-auto" style="width: 18rem;">
+            <div class="card-header bg-transparent">
+                <div class="row">
+                    <div class="col-8">
+                        <h2>{{ fit.owner.username}}</h2>
+                    </div>
+                <div class="col-4">
+                    {% if is_following %}
+                        <form action="" method="post">
+                        {% csrf_token %}
+                        <button class = "text-sm-center" name="FunButton">Unfollow</button>
+                        </form>
+                    {% elif not is_following %}
+                        <form action="" method="post">
+                        {% csrf_token %}
+                        <button class = "text-sm-center" name="FunButton" >Follow</button>
+                        </form>
+                    {% endif %}
+                    <p class="text-right">5/18/18</p>
+                </div>
+                </div>
+            </div>
+            <img class="card-img" src="{{ fit.image.url }}" alt="First Puppy Photo">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-1">
+                        <button class="btn btn-white mr-3 like" id="{{ fit.id }}">
+                            {% if fit in liked_post %}
+                                <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}"> Unlike</a> |
+                            {% else %}
+                                <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}"> Like</a> |
+                            {% endif %}
+                        <div class="like-count{{ fit.id }}">
+                        {{fit.likes.count}}</div>
 
 
-			        {% else %}
-			            <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}"> Like</a> |
+                        </button>
+                    </div>
+                </div>
 
-
-
-			        {% endif %}
-                    <div class="like-count{{ fit.id }}">
-                {{fit.likes.count}}</div>
-
-
-			    </button>
+            </div>
         </div>
-    {% empty %}
-        <li>There are no fits yet</li>
-    {% endfor %}
-    </ul>
+    </div>
+{% endfor %}
+    </div>
+    </div>
+
+
+
+
+
+
 {% endblock content%}
 
 {% block jsfiles %}

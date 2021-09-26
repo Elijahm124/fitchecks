@@ -9,37 +9,33 @@
     <title>Fitchecks</title>
 
     {% bootstrap_css %}
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     {% bootstrap_javascript jquery="full" %}
 
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-light bg-light mb-4 border">
-        {% if user.is_authenticated %}
-        <a class="navbar-brand" href="{% url 'fits:all' %}">
-            FitChecks</a>
-        {% else %}
-            <a class="navbar-brand" href="{% url 'fits:index' %}">
-            FitChecks</a>
-        {% endif %}
+    <nav class="navbar navbar-expand-md navbar-light bg-transparent mb-4 border">
+
 
         <button class="navbar-toggler" type="button" data-toggle="collapse"
                 data-target="#navbarCollapse" aria-controls="navbarCollapse"
                 aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
+
             <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
           <li class="nav-item">
           <a class="nav-link" href="{% url 'fits:index' %}">
-        Your Feed
+        Your Feed </a></li>
 
 
-    </a>
-          </li>
+
+
                     <li class="nav-item">
               <a class="nav-link" href="{% url 'fits:closets' user %}">
-        Your Closet(s)
+                  {{ user.username }}
     </a>
               </li>
                     <li class="nav-item">
@@ -55,12 +51,19 @@
                 {% endif %}
                     </ul>
 
+        <ul class="navbar-nav m-lg-auto">
+            {% if user.is_authenticated %}
+        <a class="navbar-brand" href="{% url 'fits:all' %}">
+            FitChecks</a>
+        {% else %}
+            <a class="navbar-brand" href="{% url 'fits:index' %}">
+            FitChecks</a>
+        {% endif %}
 
-            <ul class="navbar-nav ml-auto">
-      {% if user.is_authenticated %}
-        <li class="nav-item">
-          <span class="navbar-text">Hello, {{ user.username }}.</span>
-        </li>
+        </ul>
+
+<ul class="navbar-nav ml-auto">
+    {% if user.is_authenticated %}
           <li class="nav-item">
     <a class="nav-link" href="{% url 'fits:new_closet' user %}">
         New Closet
@@ -89,14 +92,14 @@
 
         </div>
 
+
     </nav>
 
 
 
     <main role="main" class="container">
-        <div class="pb-2 mb-2 border-bottom">
             {% block page_header %}{% endblock page_header %}
-        </div>
+
         <div>
             {% block content %}{% endblock content %}
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

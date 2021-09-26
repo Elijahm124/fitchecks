@@ -28,7 +28,7 @@ class Fit(models.Model):
     tags = models.CharField(max_length=100, blank=True)
     closet = models.ManyToManyField(Closet)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    shown_id = models.CharField(max_length=32, primary_key=False, default=uuid.uuid4().hex[:8], editable=False,
+    shown_id = models.CharField(max_length=32, primary_key=False, default=uuid.uuid4, editable=False,
                                 unique=True)
     private = models.BooleanField(default=False)
 
