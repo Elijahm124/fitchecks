@@ -7,6 +7,7 @@ urlpatterns = [
     path('feed', views.feed, name="feed"),
     path('all', views.all, name="all"),
     path('like', views.like, name='like_fit'),
+    path('fun', views.fun, name="fun"),
     path('<owner>/liked_fits', views.liked_fits, name='liked_fits'),
     path('<owner>/new_fit', views.new_fit, name='new_fit'),
     path('<owner>/closets', views.closets, name='closets'),

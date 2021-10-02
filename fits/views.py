@@ -5,6 +5,7 @@ from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, Bottom
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 import json
 
@@ -18,79 +19,67 @@ def index(request):
 
 def feed(request):
     context = {}
+    following = []
+    followed_people = request.user.profile.following.all()
+    fits = Fit.objects.filter(owner__profile__in=followed_people, private=False) | \
+           Fit.objects.filter(owner__username=request.user).order_by("-date_added")
+
+    context.update({'fits': fits})
+
     if not request.user.is_authenticated:
         return redirect("fits:all")
 
     else:
         liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
         context['liked_post'] = liked
-    followed_people = request.user.profile.following.all()
-    fits = Fit.objects.filter(owner__profile__in=followed_people, private=False) | \
-           Fit.objects.filter(owner__username=request.user)
-
-    context.update({'fits': fits})
-    for fit in fits:
-
-        if fit.owner != str(request.user) and request.user.is_authenticated:
-            print("not same")
-            same = False
+        for fit in fits:
             curr_user = request.user.profile
             followee = Profile.objects.get(user__username=fit.owner)
             follower = followee.followers.all()
-            if curr_user not in follower:
-                is_following = False
-                if request.method == "POST":
-                    print("follow")
-                    curr_user.following.add(followee)
-                    followee.followers.add(curr_user)
-                    is_following = True
-            else:
-                is_following = True
-                if request.method == "POST":
-                    print("unfollowed")
-                    curr_user.following.remove(followee)
-                    followee.followers.remove(curr_user)
-                    is_following = False
-            context.update({'curr_user': curr_user,
-                            'followee': followee,
-                            'is_following': is_following,
-                            'same': same})
+            if curr_user in follower:
+                following.append(fit)
+    context["following_user"] = following
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(fits, 2)
+    try:
+        fitz = paginator.page(page)
+    except PageNotAnInteger:
+        fitz = paginator.page(1)
+    except EmptyPage:
+        fitz = paginator.page(paginator.num_pages)
+    context.update({"fitz": fitz})
 
     return render(request, 'fits/feed.html', context)
 
 
 def all(request):
-    fits = Fit.objects.filter(private=False)
+    fits = Fit.objects.filter(private=False).order_by("-date_added")
     context = {'fits': fits}
+    following = []
+
     if request.user.is_authenticated:
         liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
         context['liked_post'] = liked
-    same = True
-    for fit in fits:
-        if fit.owner != str(request.user) and request.user.is_authenticated:
-            print("not same")
-            same = False
+
+        for fit in fits:
             curr_user = request.user.profile
             followee = Profile.objects.get(user__username=fit.owner)
             follower = followee.followers.all()
-            if curr_user not in follower:
-                is_following = False
-                if request.method == "POST":
-                    print("follow")
-                    curr_user.following.add(followee)
-                    followee.followers.add(curr_user)
-                    is_following = True
-            else:
-                is_following = True
-                if request.method == "POST":
-                    print("unfollowed")
-                    curr_user.following.remove(followee)
-                    followee.followers.remove(curr_user)
-                    is_following = False
-            context.update({'curr_user': curr_user,
-                            'followee': followee,
-                            'is_following': is_following,
-                            'same': same})
+            if curr_user in follower:
+                following.append(fit)
+    context["following_user"] = following
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(fits, 2)
+    try:
+        fitz = paginator.page(page)
+    except PageNotAnInteger:
+        fitz = paginator.page(1)
+    except EmptyPage:
+        fitz = paginator.page(paginator.num_pages)
+    context.update({"fitz": fitz})
+
     return render(request, 'fits/all.html', context)
 
 
@@ -133,7 +122,6 @@ def closets(request, owner):
 
 
 def closet(request, style, owner):
-
     closet = Closet.objects.get(style=style, owner__username=owner)
     if closet.style == "liked_fits":
         return redirect("fits:liked_fits", owner)
@@ -615,6 +603,33 @@ def like(request):
         "like_amount": like_count,
     }
     response = json.dumps(resp)
+    return HttpResponse(response, content_type="application/json")
+
+
+@login_required
+def fun(request):
+    fit_id = request.GET.get("funId", "")
+    fit = Fit.objects.get(pk=fit_id)
+    owner = fit.owner
+    is_following = False
+    curr_user = request.user.profile
+    followee = Profile.objects.get(user__username=owner)
+    follower = followee.followers.all()
+    if curr_user not in follower:
+        is_following = True
+        curr_user.following.add(followee)
+        followee.followers.add(curr_user)
+        print("Yayyy")
+
+    else:
+        curr_user.following.remove(followee)
+        followee.followers.remove(curr_user)
+        print("Yasssss")
+
+    resp = {
+        'is_following': is_following, }
+    response = json.dumps(resp)
+
     return HttpResponse(response, content_type="application/json")
 
 

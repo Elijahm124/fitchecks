@@ -7,33 +7,30 @@
 
 
 
-
 <h4>FitChecks - Your own virtual closet</h4>
 <div class="container">
-<div class="row">
+<div class="row infinite-container">
 
-{% for fit in fits %}
+{% for fit in fitz %}
 
-    <div class="col-xs-1">
-        <div class="card bg-transparent mx-auto my-auto" style="width: 18rem;">
+    <div class="col-xs-1 infinite-item">
+        <div class="card bg-transparent mx-md-3 my-md-3" style="width: 18rem;">
             <div class="card-header bg-transparent">
                 <div class="row">
                     <div class="col-8">
                         <h2>{{ fit.owner.username}}</h2>
                     </div>
                 <div class="col-4">
-                    {% if is_following %}
-                        <form action="" method="post">
-                        {% csrf_token %}
-                        <button class = "text-sm-center" name="FunButton">Unfollow</button>
-                        </form>
-                    {% elif not is_following %}
-                        <form action="" method="post">
-                        {% csrf_token %}
-                        <button class = "text-sm-center" name="FunButton" >Follow</button>
-                        </form>
+                    {% if fit.owner != user %}
+                    <button class="btn btn-white fun" style="display:inline" id="{{ fit.id }}">
+                        <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
+                    {% if fit in following_user and user.is_authenticated %}
+                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.id }} {{ fit.owner }}">Unfollow</a>
+                    {% elif fit not in following_user and user.is_authenticated %}
+                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.id }} {{ fit.owner }}">Follow</a>
                     {% endif %}
-                    <p class="text-right">5/18/18</p>
+                    </button>
+                    {% endif %}
                 </div>
                 </div>
             </div>
@@ -41,17 +38,18 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-1">
-                        <button class="btn btn-white mr-3 like" id="{{ fit.id }}">
+                        <button class="btn btn-white like" id="{{ fit.id }}">
                             {% if fit in liked_post %}
-                                <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}"> Unlike</a> |
+                                <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}">
+                                    <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
                             {% else %}
-                                <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}"> Like</a> |
+                                <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}">
+                                <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i>
+                                </a>
                             {% endif %}
-                        <div class="like-count{{ fit.id }}">
-                        {{fit.likes.count}}</div>
-
-
                         </button>
+                    <div class="like-count{{ fit.id }}">
+                        {{fit.likes.count}}</div>
                     </div>
                 </div>
 
@@ -60,6 +58,9 @@
     </div>
 {% endfor %}
     </div>
+{% if fitz.has_next %}
+    <a class="infinite-more-link" href="?page={{ fitz.next_page_number }}">More</a>
+    {% endif %}
     </div>
 
 
@@ -69,10 +70,65 @@
 
 {% endblock content%}
 
+{% block javascript %}
+
+    <script>
+        var infinite = new Waypoint.Infinite({
+            element: $('.infinite-container')[0],
+        });
+  </script>
+
+{% endblock %}
+
 {% block jsfiles %}
+
+    <script>
+        $(document).on('click', '.fun', function (e) {
+
+            var id = this.id;
+            var href = $(".fun").find("a").attr("href");
+            var target = $(this).find('input').val();
+
+            var owner = document.getElementsByClassName(target);
+
+
+
+            e.preventDefault();
+
+
+            $.ajax({
+                url: href,
+                data: {
+                    "funId": id,
+                },
+                success: function (response) {
+                    if (response.is_following) {
+                        for (var i = 0; i < owner.length; i++) {
+                            if (owner[i].textContent){
+                                owner[i].textContent = "Unfollow"
+                            }
+                          }
+
+
+
+
+                    } else {
+                        for (var j = 0; j < owner.length; j++) {
+                            if (owner[j].textContent){
+                                owner[j].textContent = "Follow"
+                            }
+                          }
+
+                    }
+
+                },
+            });
+        });
+
+</script>
+
 <script>
-    $(document).ready(function() {
-        $(".like").click(function (e) {
+        $(document).on('click', '.like', function (e) {
 
             var id = this.id;
             var href = $(".like").find("a").attr("href");
@@ -89,16 +145,14 @@
                 success: function (response) {
                     if (response.liked) {
                         $('.like-count' + id).text(count+1);
-                        $("#likebtn" + id).html("Unlike");
-                        $("#likebtn" + id).css("color", "red");
+                        $("#heart"+ id).toggleClass("fa fa-heart fa fa-heart-o");
 
 
 
 
                     } else {
                         $('.like-count' + id).text(count-1);
-                        $("#likebtn" + id).html("Like");
-                        $("#likebtn" + id).css("color", "green");
+                        $("#heart" + id).toggleClass("fa fa-heart-o fa fa-heart");
 
 
                     }
@@ -106,6 +160,5 @@
                 },
             });
         });
-    });
 </script>
 {% endblock jsfiles %}
