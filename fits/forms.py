@@ -66,6 +66,14 @@ class CommentForm(forms.ModelForm):
         fields = ['comment']
 
 
+class LikedFitsForm(forms.ModelForm):
+    class Meta:
+        model = Closet
+        fields = ['private']
+
+
+
+
 AccessoryFormSet = modelformset_factory(
     Accessory, fields=('brand', 'size', 'color', 'description', 'price'), extra=0
 )

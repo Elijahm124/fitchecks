@@ -1,4 +1,5 @@
 {% extends 'fits/base.html' %}
+
 {% block content %}
 
 
@@ -12,17 +13,16 @@
 
     {% if not same %}
         <!--console.log("not same")-->
-        {% if is_following %}
-                <form action="" method="post">
-                {% csrf_token %}
-                <button class = "btn btn-default" name="FunButton" >Unfollow</button>
-                </form>
-        {% elif not is_following %}
-                <form action="" method="post">
-                {% csrf_token %}
-                <button class = "btn btn-default" name="FunButton" >Follow</button>
-                </form>
-        {% endif %}
+            <div class="col-4">
+                    <button class="btn btn-white fun" style="display:inline" id="{{ owner.id }}">
+                        <input type="hidden" name="{{ owner }}" value="{{ owner }}" class="{{ owner }}">
+                    {% if is_following and user.is_authenticated %}
+                        <a href="{% url 'fits:fun' %}" class="funbtn{{ owner.id }}">Unfollow</a>
+                    {% elif not is_following and user.is_authenticated %}
+                        <a href="{% url 'fits:fun' %}" class="funbtn{{ owner.id }} {{ owner.id }}">Follow</a>
+                    {% endif %}
+                    </button>
+                </div>
     {% else %}
         <button type="button">
         <a href="{% url 'users:edit_profile' owner %}">Edit Profile</a>
@@ -42,4 +42,43 @@
         <li>There are no fits for {{ closet.owner }}'s closet {{ closet }} yet</li>
     {% endfor %}
     </ul>
+
 {% endblock content %}
+
+{% block jsfiles %}
+
+    <script>
+        $(document).on('click', '.fun', function (e) {
+
+            var id = this.id;
+            var href = $(".fun").find("a").attr("href");
+
+
+            e.preventDefault();
+
+
+            $.ajax({
+                url: href,
+                data: {
+                    "funId": id,
+                },
+                success: function (response) {
+                    if (response.is_following) {
+                        $('.funbtn' + id).html("Unfollow")
+                          }
+
+
+
+
+                    else {
+                        $('.funbtn' + id).html("Follow")
+                          }
+
+                },
+            });
+        });
+
+</script>
+
+
+{% endblock jsfiles %}

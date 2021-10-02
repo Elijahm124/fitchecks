@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Closet, Fit, Top, Accessory, Bottom, Shoe, Like
 from users.models import Profile
-from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, BottomForm, AccessoryFormSet, CommentForm
+from .forms import ClosetForm, FitForm, TopForm, AccessoryForm, ShoeForm, BottomForm, AccessoryFormSet, CommentForm, \
+    LikedFitsForm
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 import json
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def index(request):
@@ -86,37 +88,27 @@ def all(request):
 def closets(request, owner):
     if owner == str(request.user):
         closets = Closet.objects.filter(owner__username=owner).order_by('-date_added')
+        same = True
     else:
         closets = Closet.objects.filter(owner__username=owner, private=False).order_by('-date_added')
     context = {}
-    same = True
-    if owner != str(request.user) and request.user.is_authenticated:
-        print("not same")
-        same = False
+    is_following = False
+
+    if request.user.is_authenticated:
+        if owner != str(request.user):
+            same = False
         curr_user = request.user.profile
         followee = Profile.objects.get(user__username=owner)
         follower = followee.followers.all()
-        if curr_user not in follower:
-            is_following = False
-            if request.method == "POST":
-                print("follow")
-                curr_user.following.add(followee)
-                followee.followers.add(curr_user)
-                is_following = True
-        else:
+        if curr_user in follower:
             is_following = True
-            if request.method == "POST":
-                print("unfollowed")
-                curr_user.following.remove(followee)
-                followee.followers.remove(curr_user)
-                is_following = False
-        context.update({'curr_user': curr_user,
-                        'followee': followee,
-                        'is_following': is_following})
+
     owner = get_object_or_404(User, username=owner)
     context.update({'closets': closets,
                     'owner': owner,
-                    'same': same})
+                    "is_following": is_following,
+                    "same": same}
+                   )
 
     return render(request, "fits/closets.html", context)
 
@@ -608,9 +600,14 @@ def like(request):
 
 @login_required
 def fun(request):
-    fit_id = request.GET.get("funId", "")
-    fit = Fit.objects.get(pk=fit_id)
-    owner = fit.owner
+    id = request.GET.get("funId", "")
+    try:
+        fit = Fit.objects.get(shown_id__exact=id)
+    except ObjectDoesNotExist:
+        owner = User.objects.get(pk=id)
+    else:
+        owner = fit.owner
+
     is_following = False
     curr_user = request.user.profile
     followee = Profile.objects.get(user__username=owner)
@@ -633,12 +630,28 @@ def fun(request):
     return HttpResponse(response, content_type="application/json")
 
 
+@login_required
 def liked_fits(request, owner):
+    liked_closet = Closet.objects.get(owner__username=owner, style__exact="liked_fits")
+    if str(request.user) != owner:
+        if liked_closet.private:
+            raise Http404
+
+    if request.method == 'POST':
+        form = LikedFitsForm(request.POST, instance=liked_closet)
+        if form.is_valid():
+            form.save()
+
+            return redirect('fits:liked_fits', owner=owner)
+    else:
+        form = LikedFitsForm(instance=liked_closet)
     liked_outfits = Fit.objects.filter(likes__user__username=owner).order_by('-date_added')
 
     owner = get_object_or_404(User, username=owner)
     context = {
         'liked_fits': liked_outfits,
         'owner': owner,
+        'private_closet': liked_closet.private,
+        'form': form
     }
     return render(request, 'fits/liked_fits.html', context)

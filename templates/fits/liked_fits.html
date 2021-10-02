@@ -3,8 +3,18 @@
 
     <p>Liked Fits</p>
 
+    {% if owner == user %}
+
+    <form action="{% url 'fits:liked_fits' owner %}" method='post'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Save changes</button>
+     </form>
+    {% endif %}
+
 
     <p>Fits:</p>
+
     <ul>
     {% for outfit in liked_fits %}
         <li>
@@ -20,3 +30,26 @@
     </ul>
 
 {% endblock content %}
+{% block jsfiles %}
+
+<script>
+        $(document).on('click', '.prv', function (e) {
+
+            var id = this.id;
+            var href = $(".prv").find("a").attr("href");
+
+            e.preventDefault();
+
+
+            $.ajax({
+                url: href,
+                data: {
+                    "pvtID": id,
+                },
+
+
+
+            });
+        });
+</script>
+{% endblock jsfiles %}

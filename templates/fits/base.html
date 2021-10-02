@@ -27,18 +27,16 @@
 
             <ul class="navbar-nav mr-auto">
                 {% if user.is_authenticated %}
-          <li class="nav-item">
-          <a class="nav-link" href="{% url 'fits:index' %}">
-        Your Feed </a></li>
-
-
-
-
                     <li class="nav-item">
               <a class="nav-link" href="{% url 'fits:closets' user %}">
                   {{ user.username }}
     </a>
               </li>
+          <li class="nav-item">
+          <a class="nav-link" href="{% url 'fits:index' %}">
+        Your Feed </a></li>
+
+
                     <li class="nav-item">
                     <a class="nav-link" href="{% url 'fits:single_closet' user 'main_closet' %}">Your Fits</a>
                     </li>

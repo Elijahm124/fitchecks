@@ -18,16 +18,16 @@
             <div class="card-header bg-transparent">
                 <div class="row">
                     <div class="col-8">
-                        <h2>{{ fit.owner.username}}</h2>
+                        <a href="{% url 'fits:closets' fit.owner %}"><h2>{{ fit.owner.username}}</h2></a>
                     </div>
                 <div class="col-4">
                     {% if fit.owner != user %}
-                    <button class="btn btn-white fun" style="display:inline" id="{{ fit.id }}">
+                    <button class="btn btn-white fun" style="display:inline" id="{{ fit.shown_id }}">
                         <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
                     {% if fit in following_user and user.is_authenticated %}
-                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.id }} {{ fit.owner }}">Unfollow</a>
+                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
                     {% elif fit not in following_user and user.is_authenticated %}
-                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.id }} {{ fit.owner }}">Follow</a>
+                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
                     {% endif %}
                     </button>
                     {% endif %}
