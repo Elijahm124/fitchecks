@@ -7,61 +7,63 @@
 
 
 
-<h4>FitChecks - Your own virtual closet</h4>
-<div class="container">
-<div class="row infinite-container">
+    <h4>FitChecks - Your own virtual closet</h4>
+    <div class="grid">
 
-{% for fit in fitz %}
+            {% for fit in fitz %}
 
-    <div class="col-xs-1 infinite-item">
-        <div class="card bg-transparent mx-md-3 my-md-3" style="width: 18rem;">
-            <div class="card-header bg-transparent">
-                <div class="row">
-                    <div class="col-8">
-                        <a href="{% url 'fits:closets' fit.owner %}"><h2>{{ fit.owner.username}}</h2></a>
+                <div class="grid-item">
+                    <div class="card bg-transparent mx-md-3 my-md-3" style="width: 225px;">
+                        <div class="card-header bg-transparent">
+                            <div class="row">
+                                <div class="col-12" style="text-align: center">
+                                    <a href="{% url 'fits:closets' fit.owner %}"><h5>{{ fit.owner.username}}</h5></a>
+                                </div>
+                                <div class="col-4">
+                                    {% if fit.owner != user %}
+                                        <button class="btn btn-white fun" style="display:inline" id="{{ fit.shown_id }}">
+                                            <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
+                                            {% if fit in following_user and user.is_authenticated %}
+                                                <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
+                                            {% elif fit not in following_user and user.is_authenticated %}
+                                                <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <img class="card-img" src="{{ fit.image.url }}" alt="First Puppy Photo">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-1">
+                                    <button class="btn btn-white like" id="{{ fit.id }}">
+                                        {% if fit in liked_post %}
+                                            <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}">
+                                                <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
+                                        {% else %}
+                                            <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}">
+                                                <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i>
+                                            </a>
+                                        {% endif %}
+                                    </button>
+                                    <div class="like-count{{ fit.id }}">
+                                        {{fit.likes.count}}</div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                <div class="col-4">
-                    {% if fit.owner != user %}
-                    <button class="btn btn-white fun" style="display:inline" id="{{ fit.shown_id }}">
-                        <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
-                    {% if fit in following_user and user.is_authenticated %}
-                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
-                    {% elif fit not in following_user and user.is_authenticated %}
-                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
-                    {% endif %}
-                    </button>
-                    {% endif %}
                 </div>
-                </div>
-            </div>
-            <img class="card-img" src="{{ fit.image.url }}" alt="First Puppy Photo">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-1">
-                        <button class="btn btn-white like" id="{{ fit.id }}">
-                            {% if fit in liked_post %}
-                                <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}">
-                                    <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
-                            {% else %}
-                                <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}">
-                                <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i>
-                                </a>
-                            {% endif %}
-                        </button>
-                    <div class="like-count{{ fit.id }}">
-                        {{fit.likes.count}}</div>
-                    </div>
-                </div>
+            {% endfor %}
+    </div>
 
-            </div>
-        </div>
-    </div>
-{% endfor %}
-    </div>
-{% if fitz.has_next %}
-    <a class="infinite-more-link" href="?page={{ fitz.next_page_number }}">More</a>
+    {% if fitz.has_next %}
+        <a class="pagination__next" href="?page={{ fitz.next_page_number }}">More</a>
     {% endif %}
-    </div>
+
+
+
 
 
 
@@ -72,15 +74,26 @@
 
 {% block javascript %}
 
-    <script>
+    <!--<script>
         var infinite = new Waypoint.Infinite({
-            element: $('.infinite-container')[0],
+            element: $('.grid')[0],
         });
-  </script>
+    </script>-->
 
 {% endblock %}
 
 {% block jsfiles %}
+        <script>
+        var elem = document.querySelector('.grid');
+        var msrny = new Masonry(elem, {
+            itemSelector: '.grid-item',
+            gutter: 10,
+
+});
+
+
+
+    </script>
 
     <script>
         $(document).on('click', '.fun', function (e) {
@@ -107,7 +120,7 @@
                             if (owner[i].textContent){
                                 owner[i].textContent = "Unfollow"
                             }
-                          }
+                        }
 
 
 
@@ -117,7 +130,7 @@
                             if (owner[j].textContent){
                                 owner[j].textContent = "Follow"
                             }
-                          }
+                        }
 
                     }
 
@@ -125,9 +138,9 @@
             });
         });
 
-</script>
+    </script>
 
-<script>
+    <script>
         $(document).on('click', '.like', function (e) {
 
             var id = this.id;
@@ -160,5 +173,8 @@
                 },
             });
         });
-</script>
+    </script>
+
+
+
 {% endblock jsfiles %}

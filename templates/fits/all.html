@@ -3,65 +3,64 @@
 {% block cssfiles %}
 {% endblock cssfiles %}
 
+
 {% block content %}
 
 
+    <h4>FitChecks - Your own virtual closet</h4>
+    <div class="container" style="text-align: left">
+        <div class="infinite-container">
+            {% for fit in fitz %}
+                <div class="infinite-item">
+                    <div class="card bg-transparent border-0 mx-4" style="max-width: 300px;">
+                        <div class="card-header bg-transparent border-0">
+                            <div class="row">
+                                <div class="col-12">
+                                    <a href="{% url 'fits:closets' fit.owner %}"><h4>{{ fit.owner.username}}</h4></a>
+                                </div>
+                            </div>
+                        </div>
+                    <a href="{% url 'fits:fit' fit.owner fit.shown_id %}">
+                        <img class="card-img img-fluid" src="{{ fit.image.url }}" alt="First Puppy Photo">
+                    </a>
+                        <div class="card-body d-flex flex-column">
+                            <div class="row">
+                                <div class="col-12" style="">
+                                    <button class="btn btn-white like float-left" style="display: inline-block" id="{{ fit.id }}">
+                                        {% if fit in liked_post %}
+                                            <a href="{% url 'fits:like_fit' %}" class="likebtn{{ fit.id }}">
+                                                <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
+                                        {% else %}
+                                            <a href="{% url 'fits:like_fit' %}" class="likebtn{{ fit.id }}">
+                                                <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i></a>
+                                        {% endif %}
 
+                                    </button>
+                                    <span class="like-count{{ fit.id }} float-left" style="padding: 6px;">
+                                        {{fit.likes.count}}</span>
+                                    {% if fit.owner != user %}
+                                        <button class="btn btn-white fun float-right" style="display:inline" id="{{ fit.shown_id }}">
+                                            <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
+                                            {% if fit in following_user and user.is_authenticated %}
+                                                <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
+                                            {% elif fit not in following_user and user.is_authenticated %}
+                                                <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
 
-<h4>FitChecks - Your own virtual closet</h4>
-<div class="container">
-<div class="row infinite-container">
+                                </div>
+                            </div>
 
-{% for fit in fitz %}
-    <div class="col-xs-1 infinite-item">
-        <div class="card bg-transparent mx-md-3 my-md-3" style="width: 18rem;">
-            <div class="card-header bg-transparent">
-                <div class="row">
-                    <div class="col-8">
-                        <a href="{% url 'fits:closets' fit.owner %}"><h2>{{ fit.owner.username}}</h2></a>
+                        </div>
                     </div>
-                <div class="col-4">
-                    {% if fit.owner != user %}
-                    <button class="btn btn-white fun" style="display:inline" id="{{ fit.shown_id }}">
-                        <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
-                    {% if fit in following_user and user.is_authenticated %}
-                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
-                    {% elif fit not in following_user and user.is_authenticated %}
-                        <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
-                    {% endif %}
-                    </button>
-                    {% endif %}
-                </div>
-                </div>
-            </div>
-            <img class="card-img" src="{{ fit.image.url }}" alt="First Puppy Photo">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-10" style="float:left;">
-                        <button class="btn btn-white like" style="display:inline" id="{{ fit.id }}">
-                            {% if fit in liked_post %}
-                                <a href="{% url 'fits:like_fit' %}" class="likebtn{{ fit.id }}">
-                                    <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
-                            {% else %}
-                                <a href="{% url 'fits:like_fit' %}" class="likebtn{{ fit.id }}">
-                                    <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i></a>
-                            {% endif %}
-
-                        </button>
-                            <div class="like-count{{ fit.id }}">
-                {{fit.likes.count}}</div>
-
-                    </div>
                 </div>
 
-            </div>
+            {% endfor %}
+    </div>
         </div>
-    </div>
-    </div>
-{% endfor %}
-    </div>
-{% if fitz.has_next %}
-    <a class="infinite-more-link" href="?page={{ fitz.next_page_number }}">More</a>
+    {% if fitz.has_next %}
+        <a class="infinite-more-link" href="?page={{ fitz.next_page_number }}">More</a>
     {% endif %}
 
 
@@ -79,9 +78,11 @@
             element: $('.infinite-container')[0],
 
         });
-  </script>
+    </script>
 
 {% endblock %}
+
+
 
 <!-- this.innertext = Follow/Unfollow-->
 
@@ -112,7 +113,7 @@
                             if (owner[i].textContent){
                                 owner[i].textContent = "Unfollow"
                             }
-                          }
+                        }
 
 
 
@@ -122,7 +123,7 @@
                             if (owner[j].textContent){
                                 owner[j].textContent = "Follow"
                             }
-                          }
+                        }
 
                     }
 
@@ -130,11 +131,11 @@
             });
         });
 
-</script>
+    </script>
 
 
 
-<script>
+    <script>
         $(document).on('click', '.like', function (e) {
 
             var id = this.id;
@@ -165,7 +166,7 @@
             });
         });
 
-</script>
+    </script>
 
 
 

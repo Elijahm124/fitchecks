@@ -43,14 +43,14 @@ def feed(request):
     context["following_user"] = following
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(fits, 2)
+    paginator = Paginator(fits, 8)
     try:
         fitz = paginator.page(page)
     except PageNotAnInteger:
         fitz = paginator.page(1)
     except EmptyPage:
         fitz = paginator.page(paginator.num_pages)
-    context.update({"fitz": fitz})
+    context.update({"fitz": fitz, 'num_pages': paginator.num_pages})
 
     return render(request, 'fits/feed.html', context)
 
@@ -73,7 +73,7 @@ def all(request):
     context["following_user"] = following
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(fits, 2)
+    paginator = Paginator(fits, 4)
     try:
         fitz = paginator.page(page)
     except PageNotAnInteger:
