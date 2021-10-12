@@ -5,66 +5,59 @@
 
 {% block content %}
 
-
-
+    <div class="mx-5">
     <h4>FitChecks - Your own virtual closet</h4>
-    <div class="grid">
+    </div>
+    <div class="grid" id="{{ num_pages }}" style="margin: auto 0">
 
-            {% for fit in fitz %}
+        {% for fit in fitz %}
 
-                <div class="grid-item">
-                    <div class="card bg-transparent mx-md-3 my-md-3" style="width: 225px;">
-                        <div class="card-header bg-transparent">
-                            <div class="row">
-                                <div class="col-12" style="text-align: center">
-                                    <a href="{% url 'fits:closets' fit.owner %}"><h5>{{ fit.owner.username}}</h5></a>
-                                </div>
-                                <div class="col-4">
-                                    {% if fit.owner != user %}
-                                        <button class="btn btn-white fun" style="display:inline" id="{{ fit.shown_id }}">
-                                            <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
-                                            {% if fit in following_user and user.is_authenticated %}
-                                                <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
-                                            {% elif fit not in following_user and user.is_authenticated %}
-                                                <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
-                                            {% endif %}
-                                        </button>
+            <div class="grid-item">
+                <div class="card bg-transparent border-0 mx-2 my-3" style="width: 300px;">
+                    <div class="card-header bg-transparent border-0 mx-2" style="height: 3rem">
+
+                        <a class="btn follow_button" href="{% url 'fits:closets' fit.owner %}">
+                            <h4 style="font-weight: normal;">{{ fit.owner.username}}</h4></a>
+
+                    </div>
+                <div class="card-body text-center">
+                    <img class="card-img" style="max-width: 85%;" src="{{ fit.image.url }}" alt="First Puppy Photo">
+                </div>
+                    <div class="card-footer bg-transparent border-0 my-0 py-0 mx-2">
+                            {% if user.is_authenticated %}
+                                <button class="btn like" id="{{ fit.id }}" style="float: left; vertical-align: top;">
+                                    {% if fit in liked_post%}
+                                        <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}">
+                                            <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
+                                    {% else %}
+                                        <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}">
+                                            <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i>
+                                        </a>
                                     {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <img class="card-img" src="{{ fit.image.url }}" alt="First Puppy Photo">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-1">
-                                    <button class="btn btn-white like" id="{{ fit.id }}">
-                                        {% if fit in liked_post %}
-                                            <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}">
-                                                <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
-                                        {% else %}
-                                            <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}">
-                                                <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i>
-                                            </a>
+                                </button>
+
+                                <span class="like-count{{ fit.id }}" style="float: left; vertical-align: top; line-height: 38px">
+                                        {{fit.likes.count}}</span>
+                            {% endif %}
+
+                                {% if fit.owner != user %}
+                                    <button class="btn btn-white fun float-right" style="display:inline" id="{{ fit.shown_id }}">
+                                        <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
+                                        {% if fit in following_user and user.is_authenticated %}
+                                            <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
+                                        {% elif fit not in following_user and user.is_authenticated %}
+                                            <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
                                         {% endif %}
                                     </button>
-                                    <div class="like-count{{ fit.id }}">
-                                        {{fit.likes.count}}</div>
-                                </div>
-                            </div>
+                                {% endif %}
 
-                        </div>
+
+
                     </div>
                 </div>
-            {% endfor %}
+            </div>
+        {% endfor %}
     </div>
-
-    {% if fitz.has_next %}
-        <a class="pagination__next" href="?page={{ fitz.next_page_number }}">More</a>
-    {% endif %}
-
-
-
-
 
 
 
@@ -72,24 +65,32 @@
 
 {% endblock content%}
 
-{% block javascript %}
 
-    <!--<script>
-        var infinite = new Waypoint.Infinite({
-            element: $('.grid')[0],
-        });
-    </script>-->
-
-{% endblock %}
 
 {% block jsfiles %}
-        <script>
+    <script>
+    $( document ).ready(function() {
         var elem = document.querySelector('.grid');
         var msrny = new Masonry(elem, {
             itemSelector: '.grid-item',
-            gutter: 10,
 
-});
+        });
+
+
+        var page = 0;
+        var elem2 = document.querySelector('.grid');
+        var infScroll = new InfiniteScroll(elem2, {
+            path: function() {
+                if (page < elem2.id){
+                    page+=.5;
+                    return '?page=' + page;
+                }
+            },
+            append: '.grid-item',
+            outlayer: msrny,
+
+        });
+        });
 
 
 

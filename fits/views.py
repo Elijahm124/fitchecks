@@ -73,16 +73,17 @@ def all(request):
     context["following_user"] = following
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(fits, 4)
+    paginator = Paginator(fits, 8)
     try:
         fitz = paginator.page(page)
     except PageNotAnInteger:
         fitz = paginator.page(1)
     except EmptyPage:
         fitz = paginator.page(paginator.num_pages)
-    context.update({"fitz": fitz})
+    context.update({"fitz": fitz,
+                    "num_pages": paginator.num_pages})
 
-    return render(request, 'fits/all.html', context)
+    return render(request, 'fits/feed.html', context)
 
 
 def closets(request, owner):
@@ -91,12 +92,11 @@ def closets(request, owner):
         same = True
     else:
         closets = Closet.objects.filter(owner__username=owner, private=False).order_by('-date_added')
+        same = False
     context = {}
     is_following = False
 
     if request.user.is_authenticated:
-        if owner != str(request.user):
-            same = False
         curr_user = request.user.profile
         followee = Profile.objects.get(user__username=owner)
         follower = followee.followers.all()

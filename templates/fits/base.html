@@ -11,11 +11,12 @@
 
     {% bootstrap_css %}
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.scss">
     {% bootstrap_javascript jquery="full" %}
 
 </head>
 
-<body>
+<body style="font-family: 'Courier'">
     <nav class="navbar navbar-expand-md navbar-light bg-transparent mb-4 border">
 
 
@@ -96,10 +97,10 @@
 
 
 
-    <main role="main" class="container">
+    <main role="main" class="container-xxl" style="max-width: 1300px; margin: 0 auto">
             {% block page_header %}{% endblock page_header %}
 
-        <div>
+        <div style="margin: 0 auto">
             {% block content %}{% endblock content %}
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
