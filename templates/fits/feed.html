@@ -1,29 +1,31 @@
 {% extends 'fits/base.html' %}
 {% load static %}
-{% block cssfiles %}
-{% endblock cssfiles %}
+
 
 {% block content %}
 
-    <div class="mx-5">
-    <h4>FitChecks - Your own virtual closet</h4>
+    <div class="mx-5 mt-5" style="color: #5D5C61">
+    <h4>FitChecks - Your virtual closet</h4>
     </div>
-    <div class="grid" id="{{ num_pages }}" style="margin: auto 0">
+    <div class="grid mt-5" id="{{ num_pages }}" style="margin: auto 0">
 
         {% for fit in fitz %}
 
             <div class="grid-item">
-                <div class="card bg-transparent border-0 mx-2 my-3" style="width: 300px;">
-                    <div class="card-header bg-transparent border-0 mx-2" style="height: 3rem">
+                <div class="card border-0 bg-transparent mx-2 my-3" style="width: 300px;
+                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
+
+                    <div class="card-header bg-transparent border-0 mx-2" style="height: 2.5rem">
 
                         <a class="btn follow_button" href="{% url 'fits:closets' fit.owner %}">
-                            <h4 style="font-weight: normal;">{{ fit.owner.username}}</h4></a>
+                            <h5 style="font-weight: normal; color: #444444">{{ fit.owner.username}}</h5></a>
 
                     </div>
                 <div class="card-body text-center">
-                    <img class="card-img" style="max-width: 85%;" src="{{ fit.image.url }}" alt="First Puppy Photo">
+                    <a href="{% url 'fits:fit' fit.owner fit.shown_id %}">
+                    <img class="card-img" style="max-width: 95%;" src="{{ fit.image.url }}" alt="First Puppy Photo"></a>
                 </div>
-                    <div class="card-footer bg-transparent border-0 my-0 py-0 mx-2">
+                    <div class="card-footer bg-transparent border-0 mt-0 mb-3 py-0">
                             {% if user.is_authenticated %}
                                 <button class="btn like" id="{{ fit.id }}" style="float: left; vertical-align: top;">
                                     {% if fit in liked_post%}
@@ -38,18 +40,12 @@
 
                                 <span class="like-count{{ fit.id }}" style="float: left; vertical-align: top; line-height: 38px">
                                         {{fit.likes.count}}</span>
-                            {% endif %}
 
-                                {% if fit.owner != user %}
-                                    <button class="btn btn-white fun float-right" style="display:inline" id="{{ fit.shown_id }}">
-                                        <input type="hidden" name="{{ fit.owner }}" value="{{ fit.owner }}" class="{{ fit.owner }}">
-                                        {% if fit in following_user and user.is_authenticated %}
-                                            <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Unfollow</a>
-                                        {% elif fit not in following_user and user.is_authenticated %}
-                                            <a href="{% url 'fits:fun' %}" class="funbtn{{ fit.shown_id }} {{ fit.owner }}">Follow</a>
-                                        {% endif %}
-                                    </button>
-                                {% endif %}
+                                {% else %}
+                                    <div>
+
+                                    </div>
+                            {% endif %}
 
 
 
@@ -96,50 +92,6 @@
 
     </script>
 
-    <script>
-        $(document).on('click', '.fun', function (e) {
-
-            var id = this.id;
-            var href = $(".fun").find("a").attr("href");
-            var target = $(this).find('input').val();
-
-            var owner = document.getElementsByClassName(target);
-
-
-
-            e.preventDefault();
-
-
-            $.ajax({
-                url: href,
-                data: {
-                    "funId": id,
-                },
-                success: function (response) {
-                    if (response.is_following) {
-                        for (var i = 0; i < owner.length; i++) {
-                            if (owner[i].textContent){
-                                owner[i].textContent = "Unfollow"
-                            }
-                        }
-
-
-
-
-                    } else {
-                        for (var j = 0; j < owner.length; j++) {
-                            if (owner[j].textContent){
-                                owner[j].textContent = "Follow"
-                            }
-                        }
-
-                    }
-
-                },
-            });
-        });
-
-    </script>
 
     <script>
         $(document).on('click', '.like', function (e) {

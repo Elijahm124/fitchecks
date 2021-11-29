@@ -9,112 +9,117 @@
         shrink-to-fit=no">
     <title>Fitchecks</title>
 
+
     {% bootstrap_css %}
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.scss">
+
     {% bootstrap_javascript jquery="full" %}
+
 
 </head>
 
-<body style="font-family: 'Courier'">
-    <nav class="navbar navbar-expand-md navbar-light bg-transparent mb-4 border">
+<!-- #fffdfb-->
+<body style="font-family: 'PT Sans', 'Helvetica', sans-serif;
+        background-image:url('/media/images/white_wall_hash.png');
+        background-repeat:repeat-y;
+        background-size:100%;">
+<nav class="navbar navbar-expand-md navbar-light py-3" style="background-color: #557A95">
 
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarCollapse" aria-controls="navbarCollapse"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarCollapse" aria-controls="navbarCollapse"
+            aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
 
-            <ul class="navbar-nav mr-auto">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-              <a class="nav-link" href="{% url 'fits:closets' user %}">
-                  {{ user.username }}
-    </a>
-              </li>
-          <li class="nav-item">
-          <a class="nav-link" href="{% url 'fits:index' %}">
-        Your Feed </a></li>
+        <ul class="navbar-nav mr-auto">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke" href="{% url 'fits:closets' user %}">
+                        {{ user.username }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke" href="{% url 'fits:index' %}">
+                        Your Feed </a></li>
 
 
-                    <li class="nav-item">
-                    <a class="nav-link" href="{% url 'fits:single_closet' user 'main_closet' %}">Your Fits</a>
-                    </li>
-                                  {% else %}
-                    <li class="nav-item">
-          <a class="nav-link" href="{% url 'fits:all' %}">
-        Explore
-
-    </a>
-
-                {% endif %}
-                    </ul>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke"
+                       href="{% url 'fits:single_closet' user 'main_closet' %}">Your Fits</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                <a class="nav-link" href="{% url 'fits:all' %}" style="color: whitesmoke;">
+                    Explore
+                </a>
+            {% endif %}
+        </ul>
 
         <ul class="navbar-nav m-lg-auto">
             {% if user.is_authenticated %}
-        <a class="navbar-brand" href="{% url 'fits:all' %}">
-            FitChecks</a>
-        {% else %}
-            <a class="navbar-brand" href="{% url 'fits:index' %}">
-            FitChecks</a>
-        {% endif %}
+                <a class="navbar-brand px-3" style="color: whitesmoke; background-color: black;
+        box-shadow: rgba(0, 0, 0, 0.3) 0 19px 38px, rgba(0, 0, 0, 0.22) 0 15px 12px;" href="{% url 'fits:all' %}">
+                    FitChecks</a>
+            {% else %}
+                <a class="navbar-brand px-3" style="color: whitesmoke; background-color: black;
+        box-shadow: rgba(0, 0, 0, 0.3) 0 19px 38px, rgba(0, 0, 0, 0.22) 0 15px 12px;" href="{% url 'fits:index' %}">
+                    FitChecks</a>
+            {% endif %}
 
         </ul>
 
-<ul class="navbar-nav ml-auto">
-    {% if user.is_authenticated %}
-          <li class="nav-item">
-    <a class="nav-link" href="{% url 'fits:new_closet' user %}">
-        New Closet
-    </a>
-          </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'fits:new_fit' user %}">
-        New Fit
-    </a>
-          </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'users:logout' %}">Log out</a>
-        </li>
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke" href="{% url 'fits:new_closet' user %}">
+                        New Closet
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke" href="{% url 'fits:new_fit' user %}">
+                        New Fit
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke" href="{% url 'users:logout' %}">Log out</a>
+                </li>
 
 
-      {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'users:register' %}">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'users:login' %}">Log in</a></li>
-      {% endif %}
-    </ul>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" style="color: whitesmoke" href="{% url 'users:register' %}">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style=" color: whitesmoke;" href="{% url 'users:login' %}">Log in</a></li>
+            {% endif %}
+        </ul>
 
 
-
-        </div>
-
-
-    </nav>
+    </div>
 
 
+</nav>
 
-    <main role="main" class="container-xxl" style="max-width: 1300px; margin: 0 auto">
-            {% block page_header %}{% endblock page_header %}
 
-        <div style="margin: 0 auto">
-            {% block content %}{% endblock content %}
+<main role="main" class="container-xxl mt-5" style="max-width: 1300px; margin: 0 auto; ">
+    {% block page_header %}{% endblock page_header %}
+
+    <div style="margin: 0 auto">
+        {% block content %}{% endblock content %}
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/shortcuts/infinite.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/shortcuts/infinite.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
         <script src="https://unpkg.com/infinite-scroll@4/dist/infinite-scroll.pkgd.min.js"></script>
 
-    {% block javascript %}{% endblock %}
-    {% block jsfiles %}{% endblock jsfiles %}
-        </div>
-    </main>
+        {% block javascript %}{% endblock %}
+        {% block jsfiles %}{% endblock jsfiles %}
+    </div>
+</main>
 </body>
 
 </html>

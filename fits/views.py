@@ -110,6 +110,9 @@ def closets(request, owner):
                     "same": same}
                    )
 
+    liked_fits = Closet.objects.get(style="liked_fits", owner__username=owner)
+    main_closet = Closet.objects.get(style="main_closet", owner__username=owner)
+
     return render(request, "fits/closets.html", context)
 
 
@@ -117,6 +120,7 @@ def closet(request, style, owner):
     closet = Closet.objects.get(style=style, owner__username=owner)
     if closet.style == "liked_fits":
         return redirect("fits:liked_fits", owner)
+
     same = True
     if owner == str(request.user):
         fits = closet.fit_set.order_by('-date_added')
@@ -134,6 +138,21 @@ def closet(request, style, owner):
         'owner': owner,
         'same': same
     }
+
+    if request.user.is_authenticated:
+        liked = [i for i in Fit.objects.all() if Like.objects.filter(user=request.user, fit=i)]
+        context['liked_post'] = liked
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(fits, 8)
+    try:
+        fitz = paginator.page(page)
+    except PageNotAnInteger:
+        fitz = paginator.page(1)
+    except EmptyPage:
+        fitz = paginator.page(paginator.num_pages)
+    context.update({"fitz": fitz, 'num_pages': paginator.num_pages})
+
     return render(request, 'fits/single_closet.html', context)
 
 

@@ -4,7 +4,7 @@
 {% block cssfiles %}
 {% endblock cssfiles %}
 {% block content %}
-    <p><a href="{% url 'fits:closets' fit.owner %}">{{ fit.owner }}</a> </p>
+    <p><a class="btn follow_button" href="{% url 'fits:closets' fit.owner %}">{{ fit.owner }}</a> </p>
     <img
                 src="{{ fit.image.url }}" alt="img"
             >

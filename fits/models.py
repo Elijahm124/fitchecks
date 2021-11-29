@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from PIL import Image
+from PIL import Image, ExifTags
 import uuid
 from djmoney.models.fields import MoneyField
 
@@ -41,6 +41,25 @@ class Fit(models.Model):
         super(Fit, self).save(*args, **kwargs)
 
         img = Image.open(self.image.path)  # Open image using self
+        try:
+
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == 'Orientation':
+                    break
+
+            exif = img._getexif()
+
+            if exif[orientation] == 3:
+                img = img.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                img = img.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                img = img.rotate(90, expand=True)
+
+
+        except (AttributeError, KeyError, IndexError):
+            # cases: image don't have getexif
+            pass
 
         if img.height > 500 or img.width > 500:
             new_img = (500, 500)

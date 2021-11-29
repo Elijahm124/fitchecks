@@ -1,7 +1,15 @@
 {% extends 'fits/base.html' %}
 {% block content %}
 
-    <p>{{ closet }}</p>
+    <div class="mx-5 mt-5">
+    {% if closet.style == 'main_closet' %}
+    <h4>Main Closet</h4>
+    {% elif closet.style == 'liked_fits' %}
+    <h4>Liked Fits</h4>
+    {% else %}
+    <h4>{{ closet }}</h4>
+    {% endif %}
+    </div>
 {% if closet.style != 'main_closet' %}
     {% if same %}
         <button type="button">
@@ -16,19 +24,113 @@
     {% endif %}
 {% endif %}
 
-    <p>Fits:</p>
-    <ul>
-    {% for fit in fits %}
-        <li>
-            <a href="{% url 'fits:fit' closet.owner fit.shown_id %}">
-            <img
-                src="{{ fit.image.url }}" alt="img"
-            >
-                </a>
-        </li>
-    {% empty %}
-        <li>There are no fits for {{ closet.owner }}'s closet {{ closet }} yet</li>
-    {% endfor %}
-    </ul>
+    <div class="grid mt-5" id="{{ num_pages }}" style="margin: auto 0">
+
+        {% for fit in fitz %}
+
+            <div class="grid-item">
+                <div class="card border-0 bg-transparent mx-2 my-3" style="width: 300px;
+                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)">
+
+                    <div class="card-header bg-transparent border-0 mx-2" style="height: 2.5rem">
+
+                        <a class="btn follow_button" href="{% url 'fits:closets' fit.owner %}">
+                            <h5 style="font-weight: normal; color: #444444">{{ fit.owner.username}}</h5></a>
+
+                    </div>
+                <div class="card-body text-center">
+                    <a href="{% url 'fits:fit' fit.owner fit.shown_id %}">
+                    <img class="card-img" style="max-width: 95%;" src="{{ fit.image.url }}" alt="First Puppy Photo"></a>
+                </div>
+                    <div class="card-footer bg-transparent border-0 mt-0 mb-3 py-0">
+                            {% if user.is_authenticated %}
+                                <button class="btn like" id="{{ fit.id }}" style="float: left; vertical-align: top;">
+                                    {% if fit in liked_post%}
+                                        <a href="{% url 'fits:like_fit' %}" style="color:red;" id="likebtn{{ fit.id }}">
+                                            <i class="fa fa-heart" id="heart{{ fit.id }}" style="color:black;"></i></a>
+                                    {% else %}
+                                        <a href="{% url 'fits:like_fit' %}" style="color:green;" id="likebtn{{ fit.id }}">
+                                            <i class="fa fa-heart-o"  id="heart{{ fit.id }}" style="color:black;"></i>
+                                        </a>
+                                    {% endif %}
+                                </button>
+
+                                <span class="like-count{{ fit.id }}" style="float: left; vertical-align: top; line-height: 38px">
+                                        {{fit.likes.count}}</span>
+                            {% endif %}
+
+
+
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock content %}
+
+{% block jsfiles %}
+    <script>
+    $( document ).ready(function() {
+        var elem = document.querySelector('.grid');
+        var msrny = new Masonry(elem, {
+            itemSelector: '.grid-item',
+
+        });
+
+
+        var page = 0;
+        var elem2 = document.querySelector('.grid');
+        var infScroll = new InfiniteScroll(elem2, {
+            path: function() {
+                if (page < elem2.id){
+                    page+=.5;
+                    return '?page=' + page;
+                }
+            },
+            append: '.grid-item',
+            outlayer: msrny,
+
+        });
+        });
+
+
+
+    </script>
+
+     <script>
+        $(document).on('click', '.like', function (e) {
+
+            var id = this.id;
+            var href = $(".like").find("a").attr("href");
+            var count = parseInt($('.like-count' + id).text());
+
+            e.preventDefault();
+
+
+            $.ajax({
+                url: href,
+                data: {
+                    "likeId": id,
+                },
+                success: function (response) {
+                    if (response.liked) {
+                        $('.like-count' + id).text(count+1);
+                        $("#heart"+ id).toggleClass("fa fa-heart fa fa-heart-o");
+
+
+
+
+                    } else {
+                        $('.like-count' + id).text(count-1);
+                        $("#heart" + id).toggleClass("fa fa-heart-o fa fa-heart");
+
+
+                    }
+
+                },
+            });
+        });
+    </script>
+
+{% endblock jsfiles %}
